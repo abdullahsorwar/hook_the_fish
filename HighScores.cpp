@@ -61,6 +61,19 @@ void loadScoresFromFile(const std::string& filename) {
     }
 }
 void checkAndAddHighScore(const std::string& filename, const std::string& playerName, int newScore) {
+
+    if (playerName.length() > 18) {
+        std::cout << "Invalid name: must not exceed 18 characters.\n";
+        return;
+    }
+
+    for (char c : playerName) {
+        if (!(std::isalnum(c) || c == '_')) {
+            std::cout << "Invalid name: only A-Z, a-z, 0-9, and underscores (_) allowed. No spaces!\n";
+            return;
+        }
+    }
+
     loadScoresFromFile(filename);
 
     if (loadedScores.size() < 5 || newScore > loadedScores.back().second) {
@@ -81,6 +94,7 @@ void checkAndAddHighScore(const std::string& filename, const std::string& player
         }
     }
 }
+
 
 void initHighscores(SDL_Renderer* mainRenderer) {
     if (menuWindow != nullptr) return;
@@ -181,11 +195,11 @@ void renderHighscores() {
 
         renderText(subRenderer, titleFont, subWindowTitle , white, 400, 80);
         
-        renderText(subRenderer, buttonFont, "Pos.", white, 200, 150);
-        renderText(subRenderer, buttonFont, "Name", white, 350, 150);
-        renderText(subRenderer, buttonFont, "Score", white, 550, 150);
+        renderText(subRenderer, buttonFont, "Pos.", white, 100, 150);
+        renderText(subRenderer, buttonFont, "Name", white, 400, 150);
+        renderText(subRenderer, buttonFont, "Score", white, 700, 150);
 
-        int y = 190;
+        int y = 185;
         for (size_t i = 0; i < loadedScores.size(); ++i) {
             string pos;
             if (i == 0) pos = "1st";
@@ -196,9 +210,9 @@ void renderHighscores() {
             string name = loadedScores[i].first;
             int score = loadedScores[i].second;
 
-            renderText(subRenderer, buttonFont, pos, white, 200, y);
-            renderText(subRenderer, buttonFont, name, white, 350, y);
-            renderText(subRenderer, buttonFont, to_string(score), white, 550, y);
+            renderText(subRenderer, buttonFont, pos, white, 100, y);
+            renderText(subRenderer, buttonFont, name, white, 400, y);
+            renderText(subRenderer, buttonFont, to_string(score), white, 700, y);
 
             y += 40;
         }
