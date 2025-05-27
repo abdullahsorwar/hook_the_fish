@@ -8,9 +8,9 @@ static SDL_Renderer* newgameRenderer = nullptr;
 static TTF_Font* titleFont = nullptr;
 static TTF_Font* buttonFont = nullptr;
 
-static SDL_Rect easyBtn = {200, 150, 400, 60};
-static SDL_Rect mediumBtn = {200, 230, 400, 60};
-static SDL_Rect hardBtn = {200, 310, 400, 60};
+static SDL_Rect easyBtn = {200, 140, 400, 60};
+static SDL_Rect mediumBtn = {200, 220, 400, 60};
+static SDL_Rect hardBtn = {200, 300, 400, 60};
 
 void initNewGame(SDL_Renderer* mainRenderer) {
     if (newgameWindow != nullptr) return;
@@ -45,7 +45,7 @@ void handleNewGameEvents(SDL_Event& e, bool& newgameOpen) {
             
         }
 
-        SDL_Rect backBtnRect = {300, 400, 200, 60};
+        SDL_Rect backBtnRect = {300, 380, 200, 60};
         if (SDL_PointInRect(&mp, &backBtnRect)) {
             newgameOpen = false;
             destroyNewGame();
@@ -83,7 +83,7 @@ void renderNewGame() {
     drawRoundedButton(mediumBtn, "Medium", {255, 255, 100, 255}, SDL_PointInRect(&mousePoint, &mediumBtn));
     drawRoundedButton(hardBtn, "Hard", {255, 100, 100, 255}, SDL_PointInRect(&mousePoint, &hardBtn));
 
-    SDL_Rect backBtnRect = {300, 400, 200, 60};
+    SDL_Rect backBtnRect = {300, 380, 200, 60};
     Button backBtn = {backBtnRect, "Close", false};
     backBtn.hovered = SDL_PointInRect(&mousePoint, &backBtn.rect);
 

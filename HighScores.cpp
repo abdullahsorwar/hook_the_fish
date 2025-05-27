@@ -29,8 +29,8 @@ struct ScoreButton {
 };
 
 static std::vector<ScoreButton> difficultyButtons = {
-    {{65, 200, 200, 80}, {200, 100, 255, 255}, "Easy", "files/easy.txt", false},
-    {{305, 200, 200, 80}, {255, 180, 0, 255}, "Medium", "files/medium.txt", false},
+    {{65, 200, 200, 80}, {100, 255, 100, 255}, "Easy", "files/easy.txt", false},
+    {{305, 200, 200, 80}, {255, 255, 100, 255}, "Medium", "files/medium.txt", false},
     {{545, 200, 200, 80}, {255, 100, 100, 255}, "Hard", "files/hard.txt", false}
 };
 
@@ -121,6 +121,7 @@ void renderHighscores() {
     SDL_RenderClear(menuRenderer);
 
     SDL_Color white = {255, 255, 255, 255};
+    SDL_Color black = {0, 0, 0, 255};
     renderText(menuRenderer, titleFont, "HighScores", white, 400, 80);
 
     int mx, my;
@@ -134,7 +135,7 @@ void renderHighscores() {
 
         roundedBoxRGBA(menuRenderer, btn.rect.x, btn.rect.y, btn.rect.x + btn.rect.w, btn.rect.y + btn.rect.h, 40,
                        renderColor.r, renderColor.g, renderColor.b, renderColor.a);
-        renderText(menuRenderer, buttonFont, btn.label, white, btn.rect.x + btn.rect.w / 2, btn.rect.y + btn.rect.h / 2);
+        renderText(menuRenderer, buttonFont, btn.label, black, btn.rect.x + btn.rect.w / 2, btn.rect.y + btn.rect.h / 2);
     }
 
     Button closeBtn = {closeBtnRect, "Close", SDL_PointInRect(&mousePoint, &closeBtnRect)};
