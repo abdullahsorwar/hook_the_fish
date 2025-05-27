@@ -1,0 +1,5 @@
+Welcome to "Hook The Fish", here you need to catch as much fish within a certain time.
+There are three difficulties, each of these difficulties have different challanges.
+1. Easy
+2. Medium
+3. Hard

@@ -1,0 +1,3 @@
+Easy mode:
+
+It is a very basic mode, you just need to catch as much fishes within 2 minutes else your game will be over
