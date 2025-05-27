@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "NewGame.h"
 #include "Settings.h"
 #include "HighScores.h"
 #include "GameRules.h"
@@ -109,6 +110,15 @@ int main(int argc, char* argv[])
                         {
                             SDL_RaiseWindow(menuWindow);
                         }
+                        else if (btn.text == "New Game" && !newgameOpen)
+                        {
+                            initNewGame(mainRenderer);
+                            newgameOpen = true;
+                        }
+                        else if (btn.text == "New Game" && newgameOpen)
+                        {
+                            SDL_RaiseWindow(newgameWindow);
+                        }
                     }
                 }
             }
@@ -130,7 +140,10 @@ int main(int argc, char* argv[])
             }
             if (WeatherOpen) {
                 handleWeatherEvents(e, WeatherOpen);
-            }           
+            }  
+            if (newgameOpen) {
+                handleNewGameEvents(e, newgameOpen);
+            }  
         }
 
         updateClouds(clouds);
@@ -177,6 +190,10 @@ int main(int argc, char* argv[])
         {
             renderControls();
         }
+        if (newgameOpen)
+        {
+            renderNewGame();
+        }
         SDL_Delay(16);
     }
     freeTextures();
@@ -189,6 +206,7 @@ int main(int argc, char* argv[])
     if (isExitOpen()) destroyExit();
     if (isGameRulesOpen()) destroyGameRules();
     if (isControlsOpen()) destroyControls();
+    if (isNewGameOpen()) destroyNewGame();
     
     SDL_DestroyRenderer(mainRenderer);
     SDL_DestroyWindow(mainWindow);
