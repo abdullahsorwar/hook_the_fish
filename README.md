@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hook The Fish</title>
+    Hook The Fish
 </head>
 <body>
-    <h1>Authors</h1><br>
-    <p>Shadman Zaman Sajid<br>
-Md. Abdullah Bin Sorwar Chowdhury<br>
-Tahjir Tansim<br>
-Arnob Saha<\p>
+    <h1>Authors</h1>
+    Shadman Zaman Sajid<br>
+    Md. Abdullah Bin Sorwar Chowdhury<br>
+    Tahjir Tansim<br>
+    Arnob Saha
 </body>
 </html>
