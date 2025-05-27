@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 using namespace std;
 
 SDL_Window* menuWindow = nullptr;
@@ -36,6 +37,7 @@ static std::vector<ScoreButton> difficultyButtons = {
 
 static SDL_Rect closeBtnRect = {300, 380, 200, 60};
 
+
 static std::vector<pair<string, int>> loadedScores;
 
 void loadScoresFromFile(const std::string& filename) {
@@ -49,6 +51,35 @@ void loadScoresFromFile(const std::string& filename) {
     sort(loadedScores.begin(), loadedScores.end(), [](const auto& a, const auto& b) {
         return b.second < a.second;
     });
+    if (loadedScores.size() > 5) {
+        loadedScores.pop_back();
+
+        std::ofstream outFile(filename, std::ios::trunc);
+        for (const auto& entry : loadedScores) {
+            outFile << entry.first << " " << entry.second << "\n";
+        }
+    }
+}
+void checkAndAddHighScore(const std::string& filename, const std::string& playerName, int newScore) {
+    loadScoresFromFile(filename);
+
+    if (loadedScores.size() < 5 || newScore > loadedScores.back().second) {
+        std::cout << "You made a High Score!\n";
+        loadedScores.emplace_back(playerName, newScore);
+
+        std::sort(loadedScores.begin(), loadedScores.end(), [](const auto& a, const auto& b) {
+            return b.second > a.second;
+        });
+
+        if (loadedScores.size() > 5) {
+            loadedScores.pop_back();
+        }
+
+        std::ofstream outFile(filename, std::ios::trunc);
+        for (const auto& entry : loadedScores) {
+            outFile << entry.first << " " << entry.second << "\n";
+        }
+    }
 }
 
 void initHighscores(SDL_Renderer* mainRenderer) {
