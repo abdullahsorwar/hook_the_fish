@@ -67,6 +67,7 @@ extern SDL_Window* menuWindow;
 extern SDL_Window* GameRulesWindow;
 extern SDL_Window* WeatherWindow;
 extern SDL_Window* ControlWindow;
+extern SDL_Window* newgameWindow;
 extern bool GameRulesOpen;
 extern bool WeatherOpen;
 
