@@ -154,8 +154,12 @@ int main(int argc, char* argv[])
 
         SDL_Rect hook1 = {375, 40, 100, 100};
         SDL_Rect hook2 = {415, 40, 100, 100};
+        SDL_Rect copy = {530, 685, 30, 30};
+        SDL_Rect fishrod = {780, 50, 80, 80};
         SDL_RenderCopy(mainRenderer, hookleftTexture, NULL, &hook1);
         SDL_RenderCopy(mainRenderer, hookrightTexture, NULL, &hook2);
+        SDL_RenderCopy(mainRenderer, copyright, NULL, &copy);
+        //SDL_RenderCopy(mainRenderer, rodTexture, NULL, &fishrod);
 
         SDL_Color titleColor = {255, 220, 50, 255};
         renderText(mainRenderer, titleFont, "H     k the Fish", titleColor, 640, 100);
@@ -164,7 +168,6 @@ int main(int argc, char* argv[])
             drawParallelogram(mainRenderer, btn, btn.hovered);
             renderText(mainRenderer, buttonFont, btn.text, {255, 255, 255, 255}, btn.rect.x + btn.rect.w / 2, btn.rect.y + btn.rect.h / 2);
         }
-
         renderText(mainRenderer, copyrightFont, "   the_primes_of_30", {0, 0, 0, 255}, 640, 700);
 
         SDL_RenderPresent(mainRenderer);
@@ -215,6 +218,6 @@ int main(int argc, char* argv[])
     Mix_FreeMusic(intro);
     Mix_CloseAudio();
     SDL_Quit();
-    
+
     return 0;
 }
