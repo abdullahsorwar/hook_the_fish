@@ -11,6 +11,7 @@ SDL_Texture* cloudTexture = nullptr;
 SDL_Texture* hookleftTexture = nullptr;
 SDL_Texture* hookrightTexture = nullptr;
 SDL_Texture* copyright = nullptr;
+SDL_Texture* rodTexture = nullptr;
 
 void loadTextures(SDL_Renderer* renderer) {
     SDL_Surface* surf;
@@ -46,6 +47,10 @@ void loadTextures(SDL_Renderer* renderer) {
     surf = SDL_LoadBMP("bmp/copyright.bmp");
     copyright = SDL_CreateTextureFromSurface(renderer, surf);
     SDL_FreeSurface(surf);
+
+    surf = SDL_LoadBMP("bmp/rod.bmp");
+    rodTexture = SDL_CreateTextureFromSurface(renderer, surf);
+    SDL_FreeSurface(surf);
 }
 
 void freeTextures() {
@@ -57,6 +62,7 @@ void freeTextures() {
     SDL_DestroyTexture(hookleftTexture);
     SDL_DestroyTexture(hookrightTexture);
     SDL_DestroyTexture(copyright);
+    SDL_DestroyTexture(rodTexture);
 }
 
 void drawPondBackground(SDL_Renderer* renderer, int width, int height) {

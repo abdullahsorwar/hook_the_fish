@@ -57,6 +57,7 @@ extern SDL_Texture* cloudTexture;
 extern SDL_Texture* hookleftTexture;
 extern SDL_Texture* hookrightTexture;
 extern SDL_Texture* copyright;
+extern SDL_Texture* rodTexture;
 extern bool running;
 extern bool soundOn;
 extern bool sunnyOn;
