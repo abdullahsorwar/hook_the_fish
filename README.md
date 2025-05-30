@@ -16,7 +16,9 @@ SDL2 (Simple Directmedia Layer 2)
 <h3>Added Menus</h3>
 <ol>
   <li>New Game<ul>
-    <li>Easy</li>
+    <li>Easy<ul>
+      <li>Interface</li>
+    </ul></li>
     <li>Medium</li>
     <li>Hard</li>
   </ul></li>
