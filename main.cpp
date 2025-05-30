@@ -1,5 +1,6 @@
 #include "Common.h"
 #include "NewGame.h"
+#include "Interface.h"
 #include "Settings.h"
 #include "HighScores.h"
 #include "GameRules.h"
@@ -143,7 +144,7 @@ int main(int argc, char* argv[])
             }  
             if (newgameOpen) {
                 handleNewGameEvents(e, newgameOpen);
-            }  
+            }
         }
 
         updateClouds(clouds);
@@ -197,6 +198,13 @@ int main(int argc, char* argv[])
         {
             renderNewGame();
         }
+        if (interfaceOpen)
+        {
+            renderInterface();
+        }
+        if (interfaceOpen) {
+            handleInterfaceEvents(e, interfaceOpen);
+        } 
         SDL_Delay(16);
     }
     freeTextures();
@@ -210,6 +218,7 @@ int main(int argc, char* argv[])
     if (isGameRulesOpen()) destroyGameRules();
     if (isControlsOpen()) destroyControls();
     if (isNewGameOpen()) destroyNewGame();
+    if (isInterfaceOpen()) destroyInterface();
     
     SDL_DestroyRenderer(mainRenderer);
     SDL_DestroyWindow(mainWindow);
