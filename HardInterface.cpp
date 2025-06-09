@@ -29,6 +29,7 @@ static SDL_Texture* pondTexture = nullptr;
 static SDL_Texture* pond2Texture = nullptr;
 static SDL_Texture* mountainTexture = nullptr;
 static SDL_Texture* scoreTexture = nullptr;
+static SDL_Texture* heartTexture = nullptr;
 static SDL_Texture* fishTextures[12] = {nullptr};
 static SDL_Texture* objectiveTextures[6] = {nullptr};
 static SDL_Texture* rippleTextures[4] = {nullptr};
@@ -38,6 +39,8 @@ static TTF_Font* buttonFont = nullptr;
 static TTF_Font* textFont = nullptr;
 
 static int fishScore = 0;
+static int targetScore = 0;
+static int lives = 3;
 static Uint32 timerStartTime = 0;
 static bool timerRunning = false;
 static const Uint32 TIMER_DURATION = 120000;
@@ -138,6 +141,10 @@ void loadHardFishAssets() {
 
     surf = IMG_Load("png/teal.png");
     fishTextures[11] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+    SDL_FreeSurface(surf);
+
+    surf = IMG_Load("png/heart.png");
+    heartTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     for (int i = 0; i < 4; ++i) {
@@ -296,15 +303,42 @@ void renderHardFishAndRipples() {
     }
 }
 
-void handleHardFishClick(int x, int y) {
-    for (int i = 0; i < MAX_FISH; i++) {
+void handleHardFishClick(int x, int y)
+{
+    for (int i = 0; i < MAX_FISH; i++)
+    {
         if (fishes[i].active && !fishes[i].clicked &&
             x >= fishes[i].rect.x && x <= fishes[i].rect.x + fishes[i].rect.w &&
-            y >= fishes[i].rect.y && y <= fishes[i].rect.y + fishes[i].rect.h) {
-            fishScore++;
-            fishes[i].clicked = true;
-            break;
-        }
+            y >= fishes[i].rect.y && y <= fishes[i].rect.y + fishes[i].rect.h)
+            {
+                if (fishes[i].type == 0)
+                {
+                    lives--;
+                    fishes[i].clicked = true;
+                    break;
+                }
+                else if (fishes[i].type == 1)
+                {
+                    fishScore+=10;
+                    fishes[i].clicked = true;
+                    break;
+                }
+                else
+                {
+                    for (int j=0; j < 6 && !fishes[i].clicked; j++)
+                    {
+                        if (fishes[i].type == objectiveFishes[j].type)
+                        {
+                            fishScore++;
+                            targetScore--;
+                            objectiveFishes[i].count--;
+                            fishes[i].clicked = true;
+                            break;
+                        }
+                    }
+                    if (fishes[i].clicked) break;
+                }
+            }
     }
 }
 
@@ -355,6 +389,7 @@ void initHardObjective() {
         for (int i = 0; i < 6; ++i) {
             objectiveFishes[i].type = availableTypes[i];
             objectiveFishes[i].count = rand() % 6 + 4;
+            targetScore += objectiveFishes[i].count;
             loadObjectiveAssets(objectiveFishes[i].type, i);
         }
 
@@ -368,23 +403,6 @@ void renderHardInterface() {
     SDL_RenderCopy(interfaceRenderer, pondTexture, NULL, &pond);
     SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
     SDL_RenderCopy(interfaceRenderer, mountainTexture, NULL, &mountain);
-    
-    /*std::string scoreText = "Score: " + std::to_string(fishScore);
-    SDL_Color black = {0, 0, 0, 255};
-    SDL_Surface* textSurface = TTF_RenderText_Solid(textFont, scoreText.c_str(), black);
-    scoreTexture = SDL_CreateTextureFromSurface(interfaceRenderer, textSurface);
-    SDL_Rect scoreRect = {10, 10, textSurface->w, textSurface->h};
-    SDL_RenderCopy(interfaceRenderer, scoreTexture, NULL, &scoreRect);
-    SDL_FreeSurface(textSurface);
-    SDL_DestroyTexture(scoreTexture);*/
-    
-    /*std::string timerText = "Time: " + getFormattedTime();
-    SDL_Surface* textSurface = TTF_RenderText_Solid(textFont, timerText.c_str(), black);
-    SDL_Texture* timerTexture = SDL_CreateTextureFromSurface(interfaceRenderer, textSurface);
-    SDL_Rect timerRect = {1100, 10, textSurface->w, textSurface->h};
-    SDL_RenderCopy(interfaceRenderer, timerTexture, NULL, &timerRect);
-    SDL_FreeSurface(textSurface);
-    SDL_DestroyTexture(timerTexture);*/
 
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
@@ -419,7 +437,14 @@ void renderHardInterface() {
     SDL_FreeSurface(textSurface);
     SDL_DestroyTexture(timerTexture);
 
-    timerText = "Score: " + std::to_string(fishScore);
+    for (int i=0; i<lives; ++i)
+    {
+        int x = 130 + i*30;
+        SDL_Rect liveRect = {x, 45, 30, 30};
+        SDL_RenderCopy (interfaceRenderer, heartTexture, NULL, &liveRect);
+    }
+
+    timerText = "Score: " + std::to_string(fishScore) + ", Rem: " + std::to_string(targetScore);
     textSurface = TTF_RenderText_Solid(textFont, timerText.c_str(), black);
     timerTexture = SDL_CreateTextureFromSurface(interfaceRenderer, textSurface);
     timerRect = {45, 75, textSurface->w, textSurface->h};
@@ -543,8 +568,7 @@ void destroyHardInterface() {
     for (int i = 0; i < 4; ++i) {
         if (rippleTextures[i]) SDL_DestroyTexture(rippleTextures[i]);
     }
-    
-    // Reset timer when interface is destroyed
+
     timerRunning = false;
     timerStartTime = 0;
 }
