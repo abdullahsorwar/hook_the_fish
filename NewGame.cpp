@@ -1,6 +1,7 @@
 #include "NewGame.h"
-#include "Interface.h"
+#include "HardInterface.h"
 #include "Common.h"
+#include "Loading.h"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
@@ -33,21 +34,23 @@ void handleNewGameEvents(SDL_Event& e, bool& newgameOpen) {
         }
     }
 
-    if (e.type == SDL_MOUSEBUTTONDOWN) {
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(newgameWindow)) {
         SDL_Point mp = {e.button.x, e.button.y};
 
-        if (SDL_PointInRect(&mp, &easyBtn) && !interfaceOpen) {
-            initInterface (newgameRenderer);
+        /*if (SDL_PointInRect(&mp, &easyBtn) && !interfaceOpen) {
+            initInterface ();
             interfaceOpen = true;
         }
         else if (SDL_PointInRect(&mp, &easyBtn) && interfaceOpen) {
             SDL_RaiseWindow(interfaceWindow);
-        }
-        else if (SDL_PointInRect(&mp, &mediumBtn)) {
+        }*/
+        if (SDL_PointInRect(&mp, &mediumBtn)) {
             
         }
         else if (SDL_PointInRect(&mp, &hardBtn)) {
-            
+            hardinterfaceOpen = true;
+            initHardInterface();
+            Loading();
         }
 
         SDL_Rect backBtnRect = {300, 380, 200, 60};

@@ -34,7 +34,6 @@ void drawParallelogram(SDL_Renderer* renderer, Button& btn, bool hovered);
 void renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);
 void renderWrappedText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y, int wrapLength);
 
-
 Cloud generateRandomCloud();
 Fish generateRandomFish();
 
@@ -62,6 +61,7 @@ extern bool running;
 extern bool soundOn;
 extern bool sunnyOn;
 extern Mix_Music* intro;
+extern Mix_Music* game_music;
 extern SDL_Window* exitWindow;
 extern SDL_Window* settingsWindow;
 extern SDL_Window* menuWindow;
@@ -69,9 +69,12 @@ extern SDL_Window* GameRulesWindow;
 extern SDL_Window* WeatherWindow;
 extern SDL_Window* ControlWindow;
 extern SDL_Window* newgameWindow;
+extern SDL_Window* loadingWindow;
 extern SDL_Window* interfaceWindow;
+extern SDL_Window* objectiveWindow;
 extern bool GameRulesOpen;
 extern bool WeatherOpen;
-extern bool interfaceOpen;
+extern bool hardinterfaceOpen;
+extern bool objectiveClose;
 
 #endif
