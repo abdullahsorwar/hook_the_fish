@@ -1,6 +1,6 @@
 #include "Common.h"
 #include "NewGame.h"
-#include "Interface.h"
+#include "HardInterface.h"
 #include "Settings.h"
 #include "HighScores.h"
 #include "GameRules.h"
@@ -22,6 +22,7 @@ void renderFishesAndClouds(SDL_Renderer* renderer, const std::vector<Cloud>& clo
 bool running = true;
 bool soundOn = true;
 bool sunnyOn = true;
+bool objectiveClose = false;
 Mix_Music* intro = nullptr;
 
 int main(int argc, char* argv[])
@@ -88,37 +89,45 @@ int main(int argc, char* argv[])
                         {
                             initExit(mainRenderer);
                             exitOpen = true;
+                            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
                         }
                         else if (btn.text == "Exit" && exitOpen)
                         {
                             SDL_RaiseWindow(exitWindow);
+                            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
                         }
                         else if (btn.text == "Settings" && !settingsOpen)
                         {
                             initSettings(mainRenderer);
                             settingsOpen = true;
+                            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
                         }
                         else if (btn.text == "Settings" && settingsOpen)
                         {
                             SDL_RaiseWindow(settingsWindow);
+                            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
                         }
                         else if (btn.text == "High Scores" && !highscoresOpen)
                         {
                             initHighscores(mainRenderer);
                             highscoresOpen = true;
+                            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
                         }
                         else if (btn.text == "High Scores" && highscoresOpen)
                         {
                             SDL_RaiseWindow(menuWindow);
+                            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
                         }
                         else if (btn.text == "New Game" && !newgameOpen)
                         {
                             initNewGame(mainRenderer);
                             newgameOpen = true;
+                            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
                         }
                         else if (btn.text == "New Game" && newgameOpen)
                         {
                             SDL_RaiseWindow(newgameWindow);
+                            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
                         }
                     }
                 }
@@ -145,6 +154,9 @@ int main(int argc, char* argv[])
             if (newgameOpen) {
                 handleNewGameEvents(e, newgameOpen);
             }
+            if (hardinterfaceOpen) {
+                handleHardInterfaceEvents(e, hardinterfaceOpen);
+            } 
         }
 
         updateClouds(clouds);
@@ -160,7 +172,6 @@ int main(int argc, char* argv[])
         SDL_RenderCopy(mainRenderer, hookleftTexture, NULL, &hook1);
         SDL_RenderCopy(mainRenderer, hookrightTexture, NULL, &hook2);
         SDL_RenderCopy(mainRenderer, copyright, NULL, &copy);
-        //SDL_RenderCopy(mainRenderer, rodTexture, NULL, &fishrod);
 
         SDL_Color titleColor = {255, 220, 50, 255};
         renderText(mainRenderer, titleFont, "H     k the Fish", titleColor, 640, 100);
@@ -198,13 +209,13 @@ int main(int argc, char* argv[])
         {
             renderNewGame();
         }
-        if (interfaceOpen)
+        if (hardinterfaceOpen)
         {
-            renderInterface();
+            renderHardInterface();
         }
-        if (interfaceOpen) {
-            handleInterfaceEvents(e, interfaceOpen);
-        } 
+        if (hardinterfaceOpen && objectiveClose) {
+            handleHardInterfaceLogics(e, hardinterfaceOpen);
+        }
         SDL_Delay(16);
     }
     freeTextures();
@@ -218,7 +229,7 @@ int main(int argc, char* argv[])
     if (isGameRulesOpen()) destroyGameRules();
     if (isControlsOpen()) destroyControls();
     if (isNewGameOpen()) destroyNewGame();
-    if (isInterfaceOpen()) destroyInterface();
+    if (isHardInterfaceOpen()) destroyHardInterface();
     
     SDL_DestroyRenderer(mainRenderer);
     SDL_DestroyWindow(mainWindow);
