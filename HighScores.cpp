@@ -38,7 +38,7 @@ static std::vector<ScoreButton> difficultyButtons = {
 static SDL_Rect closeBtnRect = {300, 380, 200, 60};
 
 
-static std::vector<pair<string, int>> loadedScores;
+std::vector<pair<string, int>> loadedScores = {};
 
 void loadScoresFromFile(const std::string& filename) {
     loadedScores.clear();
@@ -60,17 +60,15 @@ void loadScoresFromFile(const std::string& filename) {
         }
     }
 }
-void checkAndAddHighScore(const std::string& filename, const std::string& playerName, int newScore) {
+std::string checkAndAddHighScore(const std::string& filename, const std::string& playerName, int newScore) {
 
     if (playerName.length() > 18) {
-        std::cout << "Invalid name: must not exceed 18 characters.\n";
-        return;
+        return "18";
     }
 
     for (char c : playerName) {
         if (!(std::isalnum(c) || c == '_')) {
-            std::cout << "Invalid name: only A-Z, a-z, 0-9, and underscores (_) allowed. No spaces!\n";
-            return;
+            return "-1";
         }
     }
 
@@ -81,7 +79,7 @@ void checkAndAddHighScore(const std::string& filename, const std::string& player
         loadedScores.emplace_back(playerName, newScore);
 
         std::sort(loadedScores.begin(), loadedScores.end(), [](const auto& a, const auto& b) {
-            return b.second > a.second;
+            return b.second < a.second;
         });
 
         if (loadedScores.size() > 5) {
@@ -89,10 +87,16 @@ void checkAndAddHighScore(const std::string& filename, const std::string& player
         }
 
         std::ofstream outFile(filename, std::ios::trunc);
+        if (!outFile) {
+            std::cerr << "Error: Could not open file " << filename << " for writing.\n";
+            return "-2";
+        }
         for (const auto& entry : loadedScores) {
             outFile << entry.first << " " << entry.second << "\n";
+            std::cout << "Writing: " << entry.first << " " << entry.second << std::endl;
         }
     }
+    return "0";
 }
 
 

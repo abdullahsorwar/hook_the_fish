@@ -1,5 +1,6 @@
 #include "Common.h"
 #include "HardInterface.h"
+#include "HighScores.h"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <fstream>
@@ -18,34 +19,49 @@
 static SDL_Rect pond = {0, 250, 1280, 470};
 static SDL_Rect pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250};
+static SDL_Rect inputBox = {250, 200, 300, 50};
+static SDL_Rect confirmButton = {300, 380, 200, 60};
 
 Mix_Music* game_music = nullptr;
 
 SDL_Window* interfaceWindow = nullptr;
+SDL_Window* objectiveWindow = nullptr;
+SDL_Window* gamewinWindow = nullptr;
 static SDL_Renderer* interfaceRenderer = nullptr;
 static SDL_Renderer* objectiveRenderer = nullptr;
+static SDL_Renderer* gamewinRenderer = nullptr;
 
 static SDL_Texture* pondTexture = nullptr;
 static SDL_Texture* pond2Texture = nullptr;
 static SDL_Texture* mountainTexture = nullptr;
-static SDL_Texture* scoreTexture = nullptr;
 static SDL_Texture* heartTexture = nullptr;
 static SDL_Texture* fishTextures[12] = {nullptr};
 static SDL_Texture* objectiveTextures[6] = {nullptr};
 static SDL_Texture* rippleTextures[4] = {nullptr};
 
 static TTF_Font* titleFont = nullptr;
+static TTF_Font* smalltitleFont = nullptr;
 static TTF_Font* buttonFont = nullptr;
 static TTF_Font* textFont = nullptr;
+static TTF_Font* typeFont = nullptr;
 
 static int fishScore = 0;
 static int targetScore = 0;
 static int lives = 3;
 static Uint32 timerStartTime = 0;
+static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
+static bool congratulationsFlag = false;
 static const Uint32 TIMER_DURATION = 120000;
-
 bool hardinterfaceOpen = false;
+
+std::string userInput = "";
+std::string finalText = "";
+std::string conf = "";
+static bool inputActive = false;
+static bool showCursor = true;
+static bool gamewinOpen = false;
+static Uint32 lastCursorToggle = 0;
 
 struct PondFish {
     SDL_Rect rect;
@@ -69,7 +85,8 @@ struct ObjectiveFish {
 static ObjectiveFish objectiveFishes[6];
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
-static std::vector<int> availableTypes;
+static Uint32 remaining = -1;
+static std::vector <int> availableTypes(10);
 
 std::string getFormattedTime() {
     if (!timerRunning) return "02:00";
@@ -78,9 +95,9 @@ std::string getFormattedTime() {
     Uint32 elapsed = currentTime - timerStartTime;
     Uint32 remaining = (TIMER_DURATION > elapsed) ? (TIMER_DURATION - elapsed) : 0;
     
-    if (remaining == 0) {
-        timerRunning = false;
-        // Add game over logic here if needed
+    if (remaining == 0 && targetScore == 0 && !gamewinOpen) {
+        initgameWin();
+        gamewinOpen = true;
     }
     
     int minutes = remaining / 60000;
@@ -196,10 +213,10 @@ void loadObjectiveAssets(int type, int index) {
 }
 
 void spawnHardFish() {
-    for (int i = 0; i < MAX_FISH - 6; ++i) {
-        if (!fishes[i].active && rand() % 200 == 0) {
+    for (int i = 0; i < 6; ++i) {
+        if (!fishes[i].active && rand() % 20 == 0) {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
-            fishes[i].baseY = rand() % (720 - 400) + 400;
+            fishes[i].baseY = rand() % 200 + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
             int type = availableTypes[i];
             
@@ -269,7 +286,7 @@ void updateHardFishMotion() {
         float y = fishes[i].baseY - radius * sin(angle);
 
         fishes[i].rect = {static_cast<int>(x), static_cast<int>(y), 80, 80};
-        fishes[i].t += 0.085f;
+        fishes[i].t += 0.075f;
 
         if (fishes[i].t >= PI) {
             fishes[i].active = false;
@@ -315,6 +332,7 @@ void handleHardFishClick(int x, int y)
                 {
                     lives--;
                     fishes[i].clicked = true;
+                    if (lives == 0) destroyHardInterface();
                     break;
                 }
                 else if (fishes[i].type == 1)
@@ -323,20 +341,27 @@ void handleHardFishClick(int x, int y)
                     fishes[i].clicked = true;
                     break;
                 }
-                else
+                else if (targetScore > 0)
                 {
                     for (int j=0; j < 6 && !fishes[i].clicked; j++)
                     {
-                        if (fishes[i].type == objectiveFishes[j].type)
+                        if (fishes[i].type == objectiveFishes[j].type && objectiveFishes[j].count > 0)
                         {
                             fishScore++;
                             targetScore--;
-                            objectiveFishes[i].count--;
+                            objectiveFishes[j].count--;
                             fishes[i].clicked = true;
+                            if (targetScore == 0) congratsStartTime = SDL_GetTicks();
                             break;
                         }
                     }
                     if (fishes[i].clicked) break;
+                }
+                else if (targetScore == 0)
+                {
+                    fishScore++;
+                    fishes[i].clicked = true;
+                    break;
                 }
             }
     }
@@ -353,6 +378,7 @@ void initHardInterface() {
     interfaceRenderer = SDL_CreateRenderer(interfaceWindow, -1, SDL_RENDERER_ACCELERATED);
     
     titleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 96);
+    smalltitleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 64);
     buttonFont = TTF_OpenFont("fonts/OpenSans-Bold.ttf", 32);
     textFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 32);
         
@@ -382,13 +408,13 @@ void initHardObjective() {
 
     if (!objectivesInitialized) {
         for (int i = 2; i <= 11; ++i) {
-            availableTypes.push_back(i);
+            availableTypes[i-2] = i;
         }
-        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-        std::shuffle(availableTypes.begin(), availableTypes.end(), std::default_random_engine(seed));
+        std::mt19937 seed(std::chrono::system_clock::now().time_since_epoch().count());
+        std::shuffle(availableTypes.begin(), availableTypes.end(), seed);
         for (int i = 0; i < 6; ++i) {
             objectiveFishes[i].type = availableTypes[i];
-            objectiveFishes[i].count = rand() % 6 + 4;
+            objectiveFishes[i].count = rand() % 11 + 5;
             targetScore += objectiveFishes[i].count;
             loadObjectiveAssets(objectiveFishes[i].type, i);
         }
@@ -420,7 +446,6 @@ void renderHardInterface() {
     SDL_Rect infoBox = {10, 10, 400, 200};
     drawRoundedButton(infoBox, "", white);
 
-    // Timer
     std::string timerText = "Time: " + getFormattedTime();
     SDL_Surface* textSurface = TTF_RenderText_Solid(textFont, timerText.c_str(), black);
     SDL_Texture* timerTexture = SDL_CreateTextureFromSurface(interfaceRenderer, textSurface);
@@ -468,6 +493,57 @@ void renderHardInterface() {
     }
 
     renderHardFishAndRipples();
+    if (targetScore == 0 && !congratulationsFlag) {
+        Uint32 now = SDL_GetTicks();
+        Uint32 elapsed = now - congratsStartTime;
+        float progress = elapsed / (float)3000;
+
+        if (progress >= 1.0f) {
+            congratulationsFlag = true;
+        }
+        else {
+            SDL_Color color = {0, 0, 0, 255};
+            SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(
+                textFont,
+                "      OBJECTIVES COMPLETED\nCatch as much as you can!!",
+                color,
+                0
+            );
+            SDL_Texture* texture = SDL_CreateTextureFromSurface(interfaceRenderer, surface);
+            int textW = surface->w;
+            int textH = surface->h;
+            SDL_FreeSurface(surface);
+
+            int windowW, windowH;
+            SDL_GetRendererOutputSize(interfaceRenderer, &windowW, &windowH);
+            float startY = windowH / 2.0f;
+            float endY = windowH / 2.0f - 100;
+            float yPos = startY + (endY - startY) * progress;
+
+            Uint8 alpha = 255;
+            if (elapsed < 500) {
+                alpha = (Uint8)(255.0f * (elapsed / 500.0f));
+            }
+            else if (elapsed > 2500) {
+                alpha = (Uint8)(255.0f * (1.0f - ((elapsed - 2500.0f) / 500.0f)));
+            }
+            SDL_SetTextureAlphaMod(texture, alpha);
+
+            SDL_Rect dstRect = {
+                (windowW - textW) / 2,
+                (int)yPos,
+                textW,
+                textH
+            };
+
+            SDL_RenderCopy(interfaceRenderer, texture, NULL, &dstRect);
+            SDL_DestroyTexture(texture);
+        }
+    }
+    if (gamewinOpen && targetScore == 0)
+    {
+        rendergameWin();
+    }
 
     SDL_RenderPresent(interfaceRenderer);
     if (!objectiveClose) renderHardObjective();
@@ -480,7 +556,6 @@ void renderHardObjective() {
     SDL_RenderClear(objectiveRenderer);
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
-
     renderText(objectiveRenderer, titleFont, "Objectives", black, 400, 80);
 
     int mx, my;
@@ -504,20 +579,115 @@ void renderHardObjective() {
         SDL_Rect fishRect = {centerX - 60, centerY - 30, 60, 60};
         SDL_RenderCopy(objectiveRenderer, objectiveTextures[i], NULL, &fishRect);
 
-        std::string countText = "x " + std::to_string(objectiveFishes[i].count);
+        std::string countText = " x " + std::to_string(objectiveFishes[i].count);
         renderText(objectiveRenderer, buttonFont, countText, black, centerX + 30, centerY-5);
     }
     SDL_RenderPresent(objectiveRenderer);
 }
 
+void initgameWin()
+{
+    if (gamewinWindow != nullptr) return;
+
+    gamewinWindow = SDL_CreateWindow("Winner!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
+    gamewinRenderer = SDL_CreateRenderer(gamewinWindow, -1, SDL_RENDERER_ACCELERATED);
+
+    typeFont = TTF_OpenFont ("fonts/Arial.ttf", 24);
+    SDL_StartTextInput();
+}
+
+void rendergameWin() {
+    if (!gamewinRenderer) return;
+
+    SDL_SetRenderDrawColor(gamewinRenderer, 20, 20, 40, 255);
+    SDL_RenderClear(gamewinRenderer);
+
+    SDL_Color white = {255, 255, 255, 255};
+    SDL_Color black = {0, 0, 0, 255};
+    renderText(gamewinRenderer, smalltitleFont, "Congratulations!", white, 400, 80);
+
+    int mx, my;
+    SDL_GetMouseState(&mx, &my);
+    SDL_Point mousePoint = {mx, my};
+
+    conf = (finalText == "0") ? "Exit" : "Confirm";
+    Button confirmBtn = {confirmButton, conf, false};
+    confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
+
+    drawParallelogram(gamewinRenderer, confirmBtn, confirmBtn.hovered);
+    renderText(gamewinRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
+
+    auto drawRoundedButton = [&](SDL_Rect rect, const std::string& text, SDL_Color fillColor) {
+        int radius = 5;
+        roundedBoxRGBA(gamewinRenderer,
+                       rect.x, rect.y,
+                       rect.x + rect.w, rect.y + rect.h,
+                       radius,
+                       fillColor.r, fillColor.g, fillColor.b, 100);
+        renderText(gamewinRenderer, buttonFont, text, black, rect.x + rect.w / 2, rect.y + rect.h / 2);
+    };
+    SDL_Color faded = {255, 255, 255, 255};
+    drawRoundedButton(inputBox, "", faded);
+
+    if (SDL_GetTicks() - lastCursorToggle > 500) {
+        showCursor = !showCursor;
+        lastCursorToggle = SDL_GetTicks();
+    }
+
+    renderText(gamewinRenderer, textFont, "Enter your name: ", white, 400, 150);
+
+    // --- Centered and Scrolling Text ---
+    std::string displayText = userInput;
+    if (inputActive && showCursor) {
+        displayText += "|";
+    }
+
+    // Measure full text width
+    int textWidth = 0, textHeight = 0;
+    TTF_SizeText(typeFont, displayText.c_str(), &textWidth, &textHeight);
+
+    // Scroll if text is wider than box
+    int maxVisibleWidth = inputBox.w - 20;
+    std::string visibleText = displayText;
+    while (!visibleText.empty()) {
+        TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, nullptr);
+        if (textWidth <= maxVisibleWidth) break;
+        visibleText.erase(0, 1);  // Scroll left
+    }
+
+    // Center visible text inside inputBox
+    TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, &textHeight);
+    int textX = inputBox.x + (inputBox.w - textWidth) / 2;
+    int textY = inputBox.y + (inputBox.h - textHeight) / 2;
+
+    // Render the user input
+    renderText(gamewinRenderer, typeFont, visibleText, white, textX, textY);
+
+    // Success message
+    if (finalText == "0") {
+        renderText(gamewinRenderer, textFont, "Entry Successful!", white, 400, 300);
+    }
+    else if (finalText == "18") {
+        renderText(gamewinRenderer, textFont, "Invalid name: must not exceed 18 characters.", white, 400, 300);
+    }
+    else if (finalText == "-1") {
+        renderText(gamewinRenderer, textFont, "Invalid name: only A-Z, a-z, 0-9, and underscores (_) allowed. No spaces!", white, 400, 300);
+    }
+
+    SDL_RenderPresent(gamewinRenderer);
+}
+
+
 void handleHardInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
     if (!interfaceWindow) return;
     
-    if (e.type == SDL_MOUSEBUTTONDOWN) {
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(interfaceWindow)) {
         int mouseX = e.button.x;
         int mouseY = e.button.y;
         handleHardFishClick(mouseX, mouseY);
-        
+        SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
+    }
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(objectiveWindow)) {   
         SDL_Rect backBtnRect = {300, 380, 200, 60};
         int mx, my;
         SDL_GetMouseState(&mx, &my);
@@ -526,11 +696,58 @@ void handleHardInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
         if (SDL_PointInRect(&mousePoint, &backBtnRect)) {
             SDL_DestroyRenderer(objectiveRenderer);
             SDL_DestroyWindow(objectiveWindow);
+            objectiveRenderer = nullptr;
+            objectiveWindow = nullptr;
             objectiveClose = true;
-            
-            // Start the timer when confirm is clicked
-            timerStartTime = SDL_GetTicks();
-            timerRunning = true;
+            if (!timerRunning)
+            {
+                timerStartTime = SDL_GetTicks();
+                timerRunning = true;
+            }
+            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
+        }
+    }
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gamewinWindow))
+    {
+        if (gamewinOpen)
+        {
+            int mx = e.button.x;
+            int my = e.button.y;
+            if (mx >= inputBox.x && mx <= inputBox.x + inputBox.w &&
+                my >= inputBox.y && my <= inputBox.y + inputBox.h) {
+                inputActive = true;
+            }
+            else {
+                inputActive = false;
+            }
+
+            if (mx >= confirmButton.x && mx <= confirmButton.x + confirmButton.w &&
+                my >= confirmButton.y && my <= confirmButton.y + confirmButton.h && conf == "Confirm") {
+                finalText = checkAndAddHighScore("files/hard.txt", userInput, fishScore);
+            }
+            SDL_Rect backBtnRect = {300, 380, 200, 60};
+            SDL_GetMouseState(&mx, &my);
+            SDL_Point mousePoint = {mx, my};
+            if (SDL_PointInRect(&mousePoint, &backBtnRect) && conf == "Exit") {
+                SDL_DestroyRenderer(gamewinRenderer);
+                SDL_DestroyWindow(gamewinWindow);
+                gamewinOpen = false;
+                gamewinRenderer = nullptr;
+                gamewinWindow = nullptr;
+                destroyHardInterface();
+            }
+        }
+    }
+    if (gamewinOpen)
+    {
+        if (e.type == SDL_TEXTINPUT && inputActive) {
+            userInput += e.text.text;
+        }
+
+        if (e.type == SDL_KEYDOWN && inputActive) {
+            if (e.key.keysym.sym == SDLK_BACKSPACE && !userInput.empty()) {
+                userInput.pop_back();
+            }
         }
     }
 }
@@ -548,6 +765,14 @@ void handleHardInterfaceLogics(SDL_Event& e, bool& interfaceOpen) {
     if (pond2.x > 1279) pond2.x = -1279;
 }
 
+void endGame(int targetScore)
+{
+    if (targetScore == 0)
+    {
+
+    }
+}
+
 void destroyHardInterface() {
     if (interfaceRenderer) SDL_DestroyRenderer(interfaceRenderer);
     if (interfaceWindow) SDL_DestroyWindow(interfaceWindow);
@@ -563,14 +788,59 @@ void destroyHardInterface() {
     mountainTexture = nullptr;
 
     for (int i = 0; i < 12; ++i) {
-        if (fishTextures[i]) SDL_DestroyTexture(fishTextures[i]);
+        if (fishTextures[i]) 
+        {
+            SDL_DestroyTexture(fishTextures[i]);
+            fishTextures[i] = nullptr;
+        }
+    }
+    for (int i = 0; i < 6; ++i) {
+        if (objectiveTextures[i])
+        {
+            SDL_DestroyTexture(objectiveTextures[i]);
+            objectiveTextures[i] = nullptr;
+        }
     }
     for (int i = 0; i < 4; ++i) {
-        if (rippleTextures[i]) SDL_DestroyTexture(rippleTextures[i]);
+        if (rippleTextures[i])
+        {
+            SDL_DestroyTexture(rippleTextures[i]);
+            rippleTextures[i] = nullptr;
+        }
     }
-
-    timerRunning = false;
+    if (soundOn)
+    {
+        Mix_PauseMusic();
+        game_music = nullptr;
+        Mix_PlayMusic(intro, -1);
+    }
+    else Mix_PauseMusic();
+    objectiveClose = false;
+    objectivesInitialized = false;
+    heartTexture = nullptr;
+    titleFont = nullptr;
+    smalltitleFont = nullptr;
+    buttonFont = nullptr;
+    textFont = nullptr;
+    typeFont = nullptr;
+    fishScore = 0;
+    targetScore = 0;
+    lives = 3;
     timerStartTime = 0;
+    congratsStartTime = 0;
+    timerRunning = false;
+    congratulationsFlag = false;
+    for (int i = 0; i < MAX_FISH; ++i) {
+        fishes[i] = PondFish();
+    }
+    userInput = "";
+    finalText = "";
+    conf = "";
+    inputActive = false;
+    showCursor = true;
+    gamewinOpen = false;
+    lastCursorToggle = 0;
+    remaining = -1;
 }
 
 bool isHardInterfaceOpen() {
