@@ -1,6 +1,7 @@
 #include "Common.h"
 #include "NewGame.h"
 #include "HardInterface.h"
+#include "MediumInterface.h"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <cstdlib>

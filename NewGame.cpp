@@ -1,5 +1,6 @@
 #include "NewGame.h"
 #include "HardInterface.h"
+#include "MediumInterface.h"
 #include "Common.h"
 #include "Loading.h"
 #include <SDL2/SDL_ttf.h>
@@ -45,8 +46,11 @@ void handleNewGameEvents(SDL_Event& e, bool& newgameOpen) {
             SDL_RaiseWindow(interfaceWindow);
         }*/
         if (SDL_PointInRect(&mp, &mediumBtn)) {
-            
+            MediuminterfaceOpen = true;
+            initMediumInterface();
+            Loading();
         }
+        
         else if (SDL_PointInRect(&mp, &hardBtn)) {
             hardinterfaceOpen = true;
             initHardInterface();
