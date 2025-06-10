@@ -12,7 +12,6 @@ SDL_Texture* hookleftTexture = nullptr;
 SDL_Texture* hookrightTexture = nullptr;
 SDL_Texture* copyright = nullptr;
 SDL_Texture* rodTexture = nullptr;
-SDL_Window* objectiveWindow = nullptr;
 
 void loadTextures(SDL_Renderer* renderer) {
     SDL_Surface* surf;
