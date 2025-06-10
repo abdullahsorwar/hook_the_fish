@@ -71,11 +71,13 @@ extern SDL_Window* ControlWindow;
 extern SDL_Window* newgameWindow;
 extern SDL_Window* loadingWindow;
 extern SDL_Window* interfaceWindow;
+extern SDL_Window* mediumInterfaceWindow;
 extern SDL_Window* objectiveWindow;
 extern SDL_Window* gamewinWindow;
 extern bool GameRulesOpen;
 extern bool WeatherOpen;
 extern bool hardinterfaceOpen;
+extern bool MediuminterfaceOpen;
 extern bool objectiveClose;
 
 #endif

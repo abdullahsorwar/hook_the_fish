@@ -1,6 +1,7 @@
 #include "Common.h"
 #include "NewGame.h"
 #include "HardInterface.h"
+#include "MediumInterface.h"
 #include "Settings.h"
 #include "HighScores.h"
 #include "GameRules.h"
@@ -157,6 +158,9 @@ int main(int argc, char* argv[])
             if (hardinterfaceOpen) {
                 handleHardInterfaceEvents(e, hardinterfaceOpen);
             } 
+            if(MediuminterfaceOpen){
+                handleMediumInterfaceEvents(e, MediuminterfaceOpen);
+            }
         }
 
         updateClouds(clouds);
@@ -215,6 +219,13 @@ int main(int argc, char* argv[])
         }
         if (hardinterfaceOpen && objectiveClose) {
             handleHardInterfaceLogics(e, hardinterfaceOpen);
+        }
+        if (MediuminterfaceOpen)
+        {
+            renderMediumInterface();
+        }
+        if (MediuminterfaceOpen && objectiveClose) {
+            handleMediumInterfaceLogics(e, MediuminterfaceOpen);
         }
         SDL_Delay(16);
     }
