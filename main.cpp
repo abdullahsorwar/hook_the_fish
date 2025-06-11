@@ -1,7 +1,8 @@
 #include "Common.h"
 #include "NewGame.h"
-#include "HardInterface.h"
 #include "MediumInterface.h"
+#include "HardInterface.h"
+#include "Pause.h"
 #include "Settings.h"
 #include "HighScores.h"
 #include "GameRules.h"
@@ -24,7 +25,6 @@ bool running = true;
 bool soundOn = true;
 bool sunnyOn = true;
 bool objectiveClose = false;
-Mix_Music* intro = nullptr;
 
 int main(int argc, char* argv[])
 {
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
             if (hardinterfaceOpen) {
                 handleHardInterfaceEvents(e, hardinterfaceOpen);
             } 
-            if(MediuminterfaceOpen){
+            if (MediuminterfaceOpen){
                 handleMediumInterfaceEvents(e, MediuminterfaceOpen);
             }
         }
@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
             renderHardInterface();
         }
         if (hardinterfaceOpen && objectiveClose) {
-            handleHardInterfaceLogics(e, hardinterfaceOpen);
+            handleHardInterfaceLogics();
         }
         if (MediuminterfaceOpen)
         {
@@ -241,12 +241,15 @@ int main(int argc, char* argv[])
     if (isControlsOpen()) destroyControls();
     if (isNewGameOpen()) destroyNewGame();
     if (isHardInterfaceOpen()) destroyHardInterface();
+    if (isPauseOpen()) destroyPauseMenu();
+    if (ispauseExitOpen()) destroyPauseExit();
     
     SDL_DestroyRenderer(mainRenderer);
     SDL_DestroyWindow(mainWindow);
     IMG_Quit();
     TTF_Quit();
     Mix_FreeMusic(intro);
+    Mix_FreeMusic(game_music);
     Mix_CloseAudio();
     SDL_Quit();
 

@@ -13,6 +13,13 @@ SDL_Texture* hookrightTexture = nullptr;
 SDL_Texture* copyright = nullptr;
 SDL_Texture* rodTexture = nullptr;
 
+Mix_Music* intro = nullptr;
+Mix_Music* game_music = nullptr;
+Mix_Chunk* rightfish = nullptr;
+Mix_Chunk* wrongfish = nullptr;
+Mix_Chunk* bonuscatch = nullptr;
+Mix_Chunk* crocodile = nullptr;
+
 void loadTextures(SDL_Renderer* renderer) {
     SDL_Surface* surf;
 
