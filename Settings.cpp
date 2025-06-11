@@ -119,7 +119,7 @@ void renderSettings() {
     SDL_GetMouseState(&mx, &my);
     SDL_Point mousePoint = {mx, my};
     drawRoundedButton(controlBtn, "Controls", {255, 100, 100, 255}, SDL_PointInRect(&mousePoint, &controlBtn));
-    drawRoundedButton(soundBtn, "Sound", {255, 255, 255, 255}, SDL_PointInRect(&mousePoint, &soundBtn));
+    drawRoundedButton(soundBtn, "Sound", {100, 255, 255, 255}, SDL_PointInRect(&mousePoint, &soundBtn));
     drawRoundedButton(howBtn, "Game Rules", {100, 100, 255, 255}, SDL_PointInRect(&mousePoint, &howBtn));
     drawRoundedButton(weatherBtn, "Weather", {100, 100, 100, 255}, SDL_PointInRect(&mousePoint, &weatherBtn));
 

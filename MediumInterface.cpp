@@ -116,7 +116,7 @@ void loadMediumObjectiveAssets(int type, int index)
     const char* fishPaths[11] = {
         "png/brown.png", "png/emerald.png", "png/golden.png", "png/green.png",
         "png/lavender.png", "png/olive.png", "png/orange.png", "png/purple.png",
-        "png/red.png", "png/silver.png", "png/teal.png",
+        "png/red.png", "png/silver.png", "png/teal.png"
     };
 
     SDL_Surface* surf = nullptr;
@@ -329,7 +329,7 @@ void initMediumObjective() {
     objectiveRenderer = SDL_CreateRenderer(objectiveWindow, -1, SDL_RENDERER_ACCELERATED);
 
     if (!objectivesInitialized) {
-        for (int i = 2; i <= 11; ++i) {
+        for (int i = 2; i < 11; ++i) {
             availableTypes.push_back(i);
         }
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();

@@ -19,7 +19,7 @@ void renderHardInterface();
 void renderHardObjective();
 void rendergameWin();
 void handleHardInterfaceEvents(SDL_Event& e, bool& interfaceOpen);
-void handleHardInterfaceLogics(SDL_Event& e, bool& interfaceOpen);
+void handleHardInterfaceLogics();
 void destroyHardInterface();
 bool isHardInterfaceOpen();
 

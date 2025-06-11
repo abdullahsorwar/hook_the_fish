@@ -1,6 +1,7 @@
 #include "Common.h"
 #include "HardInterface.h"
 #include "HighScores.h"
+#include "Pause.h"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <fstream>
@@ -21,8 +22,7 @@ static SDL_Rect pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250};
 static SDL_Rect inputBox = {250, 200, 300, 50};
 static SDL_Rect confirmButton = {300, 380, 200, 60};
-
-Mix_Music* game_music = nullptr;
+static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 
 SDL_Window* interfaceWindow = nullptr;
 SDL_Window* objectiveWindow = nullptr;
@@ -44,6 +44,7 @@ static TTF_Font* smalltitleFont = nullptr;
 static TTF_Font* buttonFont = nullptr;
 static TTF_Font* textFont = nullptr;
 static TTF_Font* typeFont = nullptr;
+static TTF_Font* messageFont = nullptr;
 
 static int fishScore = 0;
 static int targetScore = 0;
@@ -85,25 +86,22 @@ struct ObjectiveFish {
 static ObjectiveFish objectiveFishes[6];
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
-static Uint32 remaining = -1;
+static Uint32 remaining = 120000;
 static std::vector <int> availableTypes(10);
 
 std::string getFormattedTime() {
     if (!timerRunning) return "02:00";
     
     Uint32 currentTime = SDL_GetTicks();
-    Uint32 elapsed = currentTime - timerStartTime;
-    Uint32 remaining = (TIMER_DURATION > elapsed) ? (TIMER_DURATION - elapsed) : 0;
-    
-    if (remaining == 0 && targetScore == 0 && !gamewinOpen) {
-        initgameWin();
-        gamewinOpen = true;
-    }
+
+    Uint32 effectiveTime = isPaused? pauseStartTime : currentTime;
+    Uint32 elapsed = currentTime - (timerStartTime + totalPaused);
+    remaining = (TIMER_DURATION > elapsed) ? (TIMER_DURATION - elapsed) : 0;
     
     int minutes = remaining / 60000;
     int seconds = (remaining % 60000) / 1000;
     
-    char timeStr[6];
+    char timeStr[9];
     snprintf(timeStr, sizeof(timeStr), "%02d:%02d", minutes, seconds);
     
     return std::string(timeStr);
@@ -234,7 +232,7 @@ void spawnHardFish() {
         }
     }
     for (int i = 6; i < 8; ++i) {
-        if (!fishes[i].active && rand() % 200 == 0) {
+        if (!fishes[i].active && rand() % 50 == 0) {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
@@ -339,6 +337,7 @@ void handleHardFishClick(int x, int y)
                 {
                     fishScore+=10;
                     fishes[i].clicked = true;
+                    if (soundOn) Mix_PlayChannel(-1, bonuscatch, 0);
                     break;
                 }
                 else if (targetScore > 0)
@@ -351,7 +350,15 @@ void handleHardFishClick(int x, int y)
                             targetScore--;
                             objectiveFishes[j].count--;
                             fishes[i].clicked = true;
+                            if (soundOn) Mix_PlayChannel(-1, rightfish, 0);
                             if (targetScore == 0) congratsStartTime = SDL_GetTicks();
+                            break;
+                        }
+                        else if (fishes[i].type == objectiveFishes[j].type && objectiveFishes[j].count == 0)
+                        {
+                            if (fishScore > 0) fishScore--;
+                            fishes[i].clicked = true;
+                            if (soundOn) Mix_PlayChannel(-1, wrongfish, 0);
                             break;
                         }
                     }
@@ -361,6 +368,14 @@ void handleHardFishClick(int x, int y)
                 {
                     fishScore++;
                     fishes[i].clicked = true;
+                    if (soundOn) Mix_PlayChannel(-1, rightfish, 0);
+                    break;
+                }
+                else
+                {
+                    if (fishScore > 0) fishScore--;
+                    fishes[i].clicked = true;
+                    if (soundOn) Mix_PlayChannel(-1, wrongfish, 0);
                     break;
                 }
             }
@@ -371,6 +386,10 @@ void initHardInterface() {
     if (interfaceWindow != nullptr) return;
 
     game_music = Mix_LoadMUS("music/game_music.mp3");
+    bonuscatch = Mix_LoadWAV("music/bonuscatch.wav");
+    crocodile = Mix_LoadWAV("music/crocodile.wav");
+    rightfish = Mix_LoadWAV("music/rightfish.wav");
+    wrongfish = Mix_LoadWAV("music/wrongfish.wav");
 
     interfaceWindow = SDL_CreateWindow("Hard Mode", 
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
@@ -381,6 +400,7 @@ void initHardInterface() {
     smalltitleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 64);
     buttonFont = TTF_OpenFont("fonts/OpenSans-Bold.ttf", 32);
     textFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 32);
+    messageFont = TTF_OpenFont("fonts/ShareTech-Regular.ttf", 32);
         
     SDL_Surface* surf;
 
@@ -424,7 +444,7 @@ void initHardObjective() {
 }
 
 void renderHardInterface() {
-    if (!interfaceRenderer) return;
+    if (!interfaceRenderer || isPaused) return;
     
     SDL_RenderCopy(interfaceRenderer, pondTexture, NULL, &pond);
     SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
@@ -433,18 +453,17 @@ void renderHardInterface() {
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
 
-    auto drawRoundedButton = [&](SDL_Rect rect, const std::string& text, SDL_Color fillColor) {
-        int radius = 5;
+    auto drawRoundedButton = [&](SDL_Rect rect, const std::string& text, SDL_Color fillColor, int radius, int alpha) {
         roundedBoxRGBA(interfaceRenderer,
                        rect.x, rect.y,
                        rect.x + rect.w, rect.y + rect.h,
                        radius,
-                       fillColor.r, fillColor.g, fillColor.b, 100);
+                       fillColor.r, fillColor.g, fillColor.b, alpha);
         renderText(interfaceRenderer, buttonFont, text, black, rect.x + rect.w / 2, rect.y + rect.h / 2);
     };
 
     SDL_Rect infoBox = {10, 10, 400, 200};
-    drawRoundedButton(infoBox, "", white);
+    drawRoundedButton(infoBox, "", white, 5, 100);
 
     std::string timerText = "Time: " + getFormattedTime();
     SDL_Surface* textSurface = TTF_RenderText_Solid(textFont, timerText.c_str(), black);
@@ -544,7 +563,13 @@ void renderHardInterface() {
     {
         rendergameWin();
     }
-
+    int mx,my;
+    SDL_GetMouseState (&mx, &my);
+    SDL_Point mp = {mx, my};
+    SDL_Color color1 = {255, 180, 100, 255};
+    SDL_Color color2 = {255, 150, 0, 255};
+    drawRoundedButton (pauseBtn, "", SDL_PointInRect(&mp, &pauseBtn) ? color1:color2, 0, 255);
+    renderText (interfaceRenderer, smalltitleFont, "| |", white, 1235, 52);
     SDL_RenderPresent(interfaceRenderer);
     if (!objectiveClose) renderHardObjective();
 }
@@ -657,21 +682,22 @@ void rendergameWin() {
 
     // Center visible text inside inputBox
     TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, &textHeight);
-    int textX = inputBox.x + (inputBox.w - textWidth) / 2;
-    int textY = inputBox.y + (inputBox.h - textHeight) / 2;
+    int textX = inputBox.x + inputBox.w / 2;
+    int textY = inputBox.y + inputBox.h / 2;
 
     // Render the user input
     renderText(gamewinRenderer, typeFont, visibleText, white, textX, textY);
 
     // Success message
     if (finalText == "0") {
-        renderText(gamewinRenderer, textFont, "Entry Successful!", white, 400, 300);
+        renderText(gamewinRenderer, messageFont, "Entry Successful!", white, 400, 300);
     }
     else if (finalText == "18") {
-        renderText(gamewinRenderer, textFont, "Invalid name: must not exceed 18 characters.", white, 400, 300);
+        renderText(gamewinRenderer, messageFont, "Invalid name: must not exceed 18 characters.", white, 400, 300);
     }
     else if (finalText == "-1") {
-        renderText(gamewinRenderer, textFont, "Invalid name: only A-Z, a-z, 0-9, and underscores (_) allowed. No spaces!", white, 400, 300);
+        renderText(gamewinRenderer, messageFont, "Invalid name: only A-Z, a-z, 0-9, and", white, 400, 300);
+        renderText(gamewinRenderer, messageFont, "underscores (_) allowed. No spaces!", white, 400, 350);
     }
 
     SDL_RenderPresent(gamewinRenderer);
@@ -685,6 +711,14 @@ void handleHardInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
         int mouseX = e.button.x;
         int mouseY = e.button.y;
         handleHardFishClick(mouseX, mouseY);
+        SDL_GetMouseState (&mouseX, &mouseY);
+        SDL_Point mp = {mouseX, mouseY};
+        if (SDL_PointInRect(&mp, &pauseBtn) && !isPaused && objectiveClose)
+        {
+            initPauseMenu();
+            pauseStartTime = SDL_GetTicks();
+            isPaused = true;
+        }
         SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
     }
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(objectiveWindow)) {   
@@ -750,10 +784,15 @@ void handleHardInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
             }
         }
     }
+    if (isPaused)
+    {
+        renderPauseMenu();
+        handlePauseMenuEvents(e, isPaused);
+    }
 }
 
-void handleHardInterfaceLogics(SDL_Event& e, bool& interfaceOpen) {
-    if (!interfaceWindow) return;
+void handleHardInterfaceLogics() {
+    if (!interfaceWindow || isPaused) return;
     
     spawnHardFish();
     updateHardFishMotion();
@@ -763,6 +802,18 @@ void handleHardInterfaceLogics(SDL_Event& e, bool& interfaceOpen) {
 
     if (pond.x > 1279) pond.x = -1279;
     if (pond2.x > 1279) pond2.x = -1279;
+
+    if (remaining == 0)
+    {
+        if (targetScore == 0 && !gamewinOpen) {
+            initgameWin();
+            gamewinOpen = true;
+        }
+        else if (targetScore != 0) {
+            destroyHardInterface();
+            timerRunning = false;
+        }
+    }
 }
 
 void endGame(int targetScore)
@@ -774,31 +825,26 @@ void endGame(int targetScore)
 }
 
 void destroyHardInterface() {
-    if (interfaceRenderer) SDL_DestroyRenderer(interfaceRenderer);
-    if (interfaceWindow) SDL_DestroyWindow(interfaceWindow);
-    interfaceRenderer = nullptr;
-    interfaceWindow = nullptr;
-
-    if (pondTexture) SDL_DestroyTexture(pondTexture);
-    if (pond2Texture) SDL_DestroyTexture(pond2Texture);
-    if (mountainTexture) SDL_DestroyTexture(mountainTexture);
-
-    pondTexture = nullptr;
-    pond2Texture = nullptr;
-    mountainTexture = nullptr;
-
+    if (pondTexture)
+    {
+        SDL_DestroyTexture(pondTexture);
+        pondTexture = nullptr;
+    }
+    if (pond2Texture)
+    {
+        SDL_DestroyTexture(pond2Texture);
+        pond2Texture = nullptr;
+    }
+    if (mountainTexture)
+    {
+        SDL_DestroyTexture(mountainTexture);
+        mountainTexture = nullptr;
+    }
     for (int i = 0; i < 12; ++i) {
         if (fishTextures[i]) 
         {
             SDL_DestroyTexture(fishTextures[i]);
             fishTextures[i] = nullptr;
-        }
-    }
-    for (int i = 0; i < 6; ++i) {
-        if (objectiveTextures[i])
-        {
-            SDL_DestroyTexture(objectiveTextures[i]);
-            objectiveTextures[i] = nullptr;
         }
     }
     for (int i = 0; i < 4; ++i) {
@@ -811,7 +857,6 @@ void destroyHardInterface() {
     if (soundOn)
     {
         Mix_PauseMusic();
-        game_music = nullptr;
         Mix_PlayMusic(intro, -1);
     }
     else Mix_PauseMusic();
@@ -828,7 +873,9 @@ void destroyHardInterface() {
     lives = 3;
     timerStartTime = 0;
     congratsStartTime = 0;
-    timerRunning = false;
+    pauseStartTime = 0;
+    totalPaused = 0;
+    isPaused = false;
     congratulationsFlag = false;
     for (int i = 0; i < MAX_FISH; ++i) {
         fishes[i] = PondFish();
@@ -840,7 +887,22 @@ void destroyHardInterface() {
     showCursor = true;
     gamewinOpen = false;
     lastCursorToggle = 0;
-    remaining = -1;
+    remaining = 120000;
+    Mix_FreeChunk(bonuscatch);
+    Mix_FreeChunk(crocodile);
+    Mix_FreeChunk(rightfish);
+    Mix_FreeChunk(wrongfish);
+    if (interfaceRenderer)
+    {
+        SDL_DestroyRenderer(interfaceRenderer);
+        interfaceRenderer = nullptr;
+    }
+    if (interfaceWindow)
+    {
+        SDL_DestroyWindow(interfaceWindow);
+        interfaceWindow = nullptr;
+    }
+    hardinterfaceOpen = false;
 }
 
 bool isHardInterfaceOpen() {
