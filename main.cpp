@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     srand(static_cast<unsigned int>(time(NULL)));
 
     SDL_Window* mainWindow = SDL_CreateWindow("Hook the Fish", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_BORDERLESS);
-    SDL_Renderer* mainRenderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_SOFTWARE);
+    SDL_Renderer* mainRenderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_ACCELERATED);
 
     TTF_Font* titleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 96);
     TTF_Font* buttonFont = TTF_OpenFont("fonts/OpenSans-Bold.ttf", 32);

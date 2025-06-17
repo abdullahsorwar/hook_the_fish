@@ -4,13 +4,22 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
+struct ObjectiveFish {
+    int type;
+    int count;
+};
+
+extern ObjectiveFish objectiveFishes[];
+extern SDL_Renderer* hardInterfaceRenderer;
+
 void loadHardFishAssets();
 void loadObjectiveAssets(int type, int index);
 void spawnHardFish();
 void updateHardFishMotion();
 void renderHardFishAndRipples();
+void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count);
 void handleHardFishClick(int x, int y);
-void endGame(int targetScore);
+void gameCondition();
 
 void initHardInterface();
 void initHardObjective();

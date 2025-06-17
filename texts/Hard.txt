@@ -1,3 +1,4 @@
-Hard mode:
-
-This mode is super challenging, you need to deal with piranhas as well as crocodiles. If crocodiles somehow catches you, you will lose the game, so be very careful.
+Hard Mode:
+In this mode, piranhas drain a life, and crocodiles end the game instantly. Catch golden fishes to keep crocodiles away. You must complete all objective fishes for your score to count. Catching a completed objective fish again before finishing all others will deduct score. After completing the objectives, you can catch freely for extra score!
+Scoring Criteria:
+Golden Fish = +10       Objective Fish = +1
