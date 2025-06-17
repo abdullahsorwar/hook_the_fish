@@ -12,24 +12,70 @@
 
 SDL_Window* pauseWindow = nullptr;
 SDL_Window* pauseExitWindow = nullptr;
+SDL_Window* pauseObjectiveWindow = nullptr;
 static SDL_Renderer* pauseRenderer = nullptr;
 static SDL_Renderer* pauseExitRenderer = nullptr;
+static SDL_Renderer* pauseObjectiveRenderer = nullptr;
 bool isPaused = false;
 static bool isExit = false;
+static bool objectiveOpen = false;
 Uint32 pauseStartTime = 0;
 Uint32 totalPaused = 0;
+static SDL_Texture* objectiveTextures[6] = {nullptr};
 
 TTF_Font* titleFont = nullptr;
 TTF_Font* buttonFont = nullptr;
 TTF_Font* textFont = nullptr;
 
-static SDL_Rect resumeBtn = {200, 160, 400, 50};
-static SDL_Rect soundBtn = {200, 220, 400, 50};
-static SDL_Rect toggleRect = {500, 230, 40, 30};
-static SDL_Rect gameruleBtn = {200, 280, 400, 50};
-static SDL_Rect exitBtn = {200, 340, 400, 50};
+static SDL_Rect resumeBtn = {200, 145, 400, 50};
+static SDL_Rect objectiveBtn = {200, 205, 400, 50};
+static SDL_Rect soundBtn = {200, 265, 400, 50};
+static SDL_Rect toggleRect = {500, 275, 40, 30};
+static SDL_Rect gameruleBtn = {200, 325, 400, 50};
+static SDL_Rect exitBtn = {200, 385, 400, 50};
 static SDL_Rect YesBtn = {150, 350, 200, 80};
 static SDL_Rect NoBtn = {450, 350, 200, 80};
+
+void loadPauseObjectiveAssets (int type, int index)
+{
+    SDL_Surface* surf = nullptr;
+
+    if (type == 2) {
+        surf = IMG_Load("png/brown.png");
+    }
+    else if (type == 3) {
+        surf = IMG_Load("png/emerald.png");
+    }
+    else if (type == 4) {
+        surf = IMG_Load("png/green.png");
+    }
+    else if (type == 5) {
+        surf = IMG_Load("png/lavender.png");
+    }
+    else if (type == 6) {
+        surf = IMG_Load("png/olive.png");
+    }
+    else if (type == 7) {
+        surf = IMG_Load("png/orange.png");
+    }
+    else if (type == 8) {
+        surf = IMG_Load("png/purple.png");
+    }
+    else if (type == 9) {
+        surf = IMG_Load("png/red.png");
+    }
+    else if (type == 10) {
+        surf = IMG_Load("png/silver.png");
+    }
+    else if (type == 11) {
+        surf = IMG_Load("png/teal.png");
+    }
+
+    if (surf != nullptr) {
+        objectiveTextures[index] = SDL_CreateTextureFromSurface(pauseObjectiveRenderer, surf);
+        SDL_FreeSurface(surf);
+    }
+}
 
 void initPauseMenu()
 {
@@ -51,6 +97,19 @@ void initPauseExit()
     pauseExitWindow = SDL_CreateWindow ("Pause Exit", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_BORDERLESS);
     pauseExitRenderer = SDL_CreateRenderer (pauseExitWindow, -1, SDL_RENDERER_ACCELERATED);
 }
+
+void initPauseObjective()
+{
+    if (pauseObjectiveWindow != nullptr) return;
+
+    pauseObjectiveWindow = SDL_CreateWindow ("Pause Objective", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_BORDERLESS);
+    pauseObjectiveRenderer = SDL_CreateRenderer (pauseObjectiveWindow, -1, SDL_RENDERER_ACCELERATED);
+    for (int i=0;i<6;i++)
+    {
+        loadPauseObjectiveAssets(objectiveFishes[i].type, i);
+    }
+}
+
 
 void renderPauseMenu()
 {
@@ -87,6 +146,7 @@ void renderPauseMenu()
     SDL_GetMouseState(&mx, &my);
     SDL_Point mp = {mx,my};
     drawRoundedButton (resumeBtn, "Resume", {255, 100, 100, 255}, SDL_PointInRect(&mp, &resumeBtn));
+    drawRoundedButton (objectiveBtn, "Objectives", {100, 255, 100, 255}, SDL_PointInRect(&mp, &objectiveBtn));
     drawRoundedButton (soundBtn, "Sound", {100, 255, 255, 255}, SDL_PointInRect(&mp, &soundBtn));
     drawRoundedButton (gameruleBtn, "Game Rules", {100, 100, 255, 255}, SDL_PointInRect(&mp, &gameruleBtn));
     drawRoundedButton (exitBtn, "Exit", {100, 100, 100, 255}, SDL_PointInRect(&mp, &exitBtn));
@@ -142,6 +202,43 @@ void renderPauseExit()
     SDL_RenderPresent(pauseExitRenderer);
 }
 
+void renderPauseObjective()
+{
+    if (!pauseObjectiveWindow) return;
+    SDL_SetRenderDrawColor (pauseObjectiveRenderer, 100, 255, 100, 255);
+    SDL_RenderClear (pauseObjectiveRenderer);
+
+    SDL_Color white = {255, 255, 255, 255};
+    SDL_Color black = {0, 0, 0, 255};
+    renderText(pauseObjectiveRenderer, titleFont, "Objectives", black, 400, 80);
+
+    int mx, my;
+    SDL_GetMouseState(&mx, &my);
+    SDL_Point mp = {mx,my};
+
+    SDL_Rect backBtnRect = {300, 380, 200, 60};
+    Button backBtn = {backBtnRect, "Confirm", false};
+    backBtn.hovered = SDL_PointInRect(&mp, &backBtn.rect);
+
+    drawParallelogram(pauseObjectiveRenderer, backBtn, backBtn.hovered);
+    renderText(pauseObjectiveRenderer, buttonFont, backBtn.text, white, backBtn.rect.x + backBtn.rect.w / 2, backBtn.rect.y + backBtn.rect.h / 2);
+
+    for (int i = 0; i < 6; ++i) {
+        int col = (i < 3) ? 0 : 1;
+        int row = i % 3;
+
+        int centerX = (col == 0) ? 200 : 600;
+        int centerY = 160 + row * 90;
+
+        SDL_Rect fishRect = {centerX - 60, centerY - 30, 60, 60};
+        SDL_RenderCopy(pauseObjectiveRenderer, objectiveTextures[i], NULL, &fishRect);
+
+        std::string countText = " x " + std::to_string(objectiveFishes[i].count);
+        renderText(pauseObjectiveRenderer, buttonFont, countText, black, centerX + 35, centerY-5);
+    }
+    SDL_RenderPresent(pauseObjectiveRenderer);
+}
+
 void handlePauseMenuEvents(SDL_Event& e, bool& isPaused)
 {
     if (pauseWindow && e.window.windowID == SDL_GetWindowID(pauseWindow)) {
@@ -153,6 +250,13 @@ void handlePauseMenuEvents(SDL_Event& e, bool& isPaused)
             if (SDL_PointInRect(&mp, &resumeBtn)) {
                 destroyPauseMenu();
                 isPaused = false;
+            }
+            if (SDL_PointInRect(&mp, &objectiveBtn) && !objectiveOpen) {
+                initPauseObjective();
+                objectiveOpen = true;
+            }
+            else if (SDL_PointInRect(&mp, &objectiveBtn) && objectiveOpen) {
+                SDL_RaiseWindow(pauseObjectiveWindow);
             }
             if (SDL_PointInRect(&mp, &soundBtn)) {
                 soundOn = !soundOn;
@@ -179,11 +283,24 @@ void handlePauseMenuEvents(SDL_Event& e, bool& isPaused)
                 SDL_RaiseWindow(pauseExitWindow);
             }
         }
+        if (e.type = SDL_KEYDOWN)
+        {
+            if (e.key.keysym.sym == SDLK_ESCAPE && isPaused)
+            {
+                destroyPauseMenu();
+                isPaused = false;
+            }
+        }
     }
     if (isExit)
     {
         renderPauseExit();
         handlePauseExitEvents(e, isExit);
+    }
+    if (objectiveOpen)
+    {
+        renderPauseObjective();
+        handlePauseObjectiveEvents(e, objectiveOpen);
     }
 }
 
@@ -209,6 +326,30 @@ void handlePauseExitEvents(SDL_Event& e, bool& isExit) {
             destroyPauseExit();
             destroyPauseMenu();
             if (hardinterfaceOpen) destroyHardInterface();
+        }
+    }
+}
+
+void handlePauseObjectiveEvents(SDL_Event& e, bool& objectiveOpen)
+{
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(pauseObjectiveWindow)) {   
+        SDL_Rect backBtnRect = {300, 380, 200, 60};
+        int mx, my;
+        SDL_GetMouseState(&mx, &my);
+        SDL_Point mousePoint = {mx, my};
+        
+        if (SDL_PointInRect(&mousePoint, &backBtnRect)) {
+            for (int i=0;i<6;i++)
+            {
+                SDL_DestroyTexture(objectiveTextures[i]);
+                objectiveTextures[i] = nullptr;
+            }
+            SDL_DestroyRenderer(pauseObjectiveRenderer);
+            SDL_DestroyWindow(pauseObjectiveWindow);
+            pauseObjectiveRenderer = nullptr;
+            pauseObjectiveWindow = nullptr;
+            objectiveOpen = false;
+            SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
         }
     }
 }

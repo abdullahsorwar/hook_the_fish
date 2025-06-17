@@ -37,26 +37,22 @@ void handleNewGameEvents(SDL_Event& e, bool& newgameOpen) {
 
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(newgameWindow)) {
         SDL_Point mp = {e.button.x, e.button.y};
-
-        /*if (SDL_PointInRect(&mp, &easyBtn) && !interfaceOpen) {
-            initInterface ();
-            interfaceOpen = true;
-        }
-        else if (SDL_PointInRect(&mp, &easyBtn) && interfaceOpen) {
-            SDL_RaiseWindow(interfaceWindow);
-        }*/
         if (SDL_PointInRect(&mp, &mediumBtn)) {
             MediuminterfaceOpen = true;
             initMediumInterface();
             Loading();
         }
-        
         else if (SDL_PointInRect(&mp, &hardBtn)) {
             hardinterfaceOpen = true;
             initHardInterface();
             Loading();
         }
-
+        /*else if (SDL_PointInRect(&mp, &easyBtn))
+        {
+            easyinterfaceOpen = true;
+            initEasyInterface();
+            Loading();
+        }*/
         SDL_Rect backBtnRect = {300, 380, 200, 60};
         if (SDL_PointInRect(&mp, &backBtnRect)) {
             newgameOpen = false;

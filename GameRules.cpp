@@ -15,6 +15,7 @@ static SDL_Rect ArrowRightBtn = {740, 240, 50, 50};
 static SDL_Rect backBtn = {300, 380, 200, 60};
 static TTF_Font* titleFont = nullptr;
 static TTF_Font* GameRulesFont = nullptr;
+static TTF_Font* HardGameRulesFont = nullptr;
 static TTF_Font* buttonFont = nullptr;
 static int currentPage = 0;
 const int totalPages = 4;
@@ -64,6 +65,7 @@ void initGameRules(SDL_Renderer* settingsRenderer) {
     titleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 96);
     buttonFont = TTF_OpenFont("fonts/OpenSans-Bold.ttf", 32);
     GameRulesFont = TTF_OpenFont("fonts/ShareTech-Regular.ttf", 32);
+    HardGameRulesFont = TTF_OpenFont("fonts/ShareTech-Regular.ttf", 24);
     updatePageContent();
 }
 
@@ -108,7 +110,7 @@ void renderGameRules() {
     SDL_Color bhondo = {255, 255, 255, 255};
     
     renderText(GameRulesRenderer, titleFont, "Game Rules", bhondo, 400, 80);
-    renderWrappedText(GameRulesRenderer, GameRulesFont, pageText.c_str(), black, 420, 245, 650);
+    renderWrappedText(GameRulesRenderer, (currentPage == 3)? HardGameRulesFont : GameRulesFont, pageText.c_str(), black, 420, 245, 650);
     
     if (currentPage > 0) {
         SDL_RenderCopy(GameRulesRenderer, LeftHook, NULL, &ArrowLeftBtn);
