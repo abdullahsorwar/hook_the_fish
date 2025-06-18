@@ -10,7 +10,7 @@ struct ObjectiveFish {
 };
 
 extern ObjectiveFish objectiveFishes[];
-extern SDL_Renderer* hardInterfaceRenderer;
+//extern SDL_Renderer* hardInterfaceRenderer;
 
 void loadHardFishAssets();
 void loadObjectiveAssets(int type, int index);
