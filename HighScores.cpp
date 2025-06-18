@@ -64,7 +64,7 @@ void loadScoresFromFile(const std::string& filename) {
 bool checkHighScore(const std::string& filename, int newScore)
 {
     loadScoresFromFile(filename);
-    if (loadedScores.size() < 5 || newScore > loadedScores.back().second) return true;
+    if (newScore > loadedScores.back().second) return true;
     else return false;
 }
 
@@ -82,7 +82,7 @@ std::string checkAndAddHighScore(const std::string& filename, const std::string&
 
     loadScoresFromFile(filename);
 
-    if (loadedScores.size() < 5 || newScore > loadedScores.back().second) {
+    if (newScore > loadedScores.back().second) {
         std::cout << "You made a High Score!\n";
         loadedScores.emplace_back(playerName, newScore);
 

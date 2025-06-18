@@ -9,7 +9,9 @@
 
 void initGameOver();
 void renderGameOver();
+void renderHighScoreTrue();
 void handleGameOverEvents(SDL_Event& e, bool& gameoverOpen);
+void handleHighScoreTrue(SDL_Event& e, bool& gameoverOpen);
 void destroyGameOver();
 bool isGameOverOpen();
 
