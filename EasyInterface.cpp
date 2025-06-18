@@ -806,6 +806,7 @@ void handleEasyInterfaceLogics() {
 
     spawnEasyFish();
     updateEasyFishMotion();
+    updateRain();
 
     pond.x += 1;
     pond2.x += 1;

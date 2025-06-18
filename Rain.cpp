@@ -1,5 +1,8 @@
 #include "Common.h"
 #include "HardInterface.h"
+#include "MediumInterface.h"
+#include "EasyInterface.h"
+#include "Rain.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <vector>
