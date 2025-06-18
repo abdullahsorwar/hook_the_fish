@@ -51,7 +51,7 @@ static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
 static bool congratulationsFlag = false;
-static const Uint32 TIMER_DURATION = 5000;
+static const Uint32 TIMER_DURATION = 120000;
 bool hardinterfaceOpen = false;
 
 struct PondFish
@@ -82,7 +82,7 @@ struct FloatingText
 ObjectiveFish objectiveFishes[6] = {0};
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
-static Uint32 remaining = 5000;
+static Uint32 remaining = 120000;
 static std::vector<int> availableTypes(10);
 static std::vector<FloatingText> floatingTexts;
 
@@ -966,7 +966,7 @@ void destroyHardInterface()
     {
         fishes[i] = PondFish();
     }
-    remaining = 5000;
+    remaining = 120000;
     Mix_FreeChunk(bonuscatch);
     Mix_FreeChunk(crocodile);
     Mix_FreeChunk(rightfish);
