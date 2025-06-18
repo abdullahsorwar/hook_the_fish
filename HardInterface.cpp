@@ -25,10 +25,10 @@ static SDL_Rect inputBox = {250, 200, 300, 50};
 static SDL_Rect confirmButton = {300, 380, 200, 60};
 static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 
-SDL_Window *hardInterfaceWindow = nullptr;
+//SDL_Window *interfaceWindow = nullptr;
 SDL_Window *objectiveWindow = nullptr;
 SDL_Window *gamewinWindow = nullptr;
-SDL_Renderer *hardInterfaceRenderer = nullptr;
+//SDL_Renderer *interfaceRenderer = nullptr;
 static SDL_Renderer *objectiveRenderer = nullptr;
 static SDL_Renderer *gamewinRenderer = nullptr;
 
@@ -122,62 +122,62 @@ void loadHardFishAssets()
     SDL_Surface *surf;
 
     surf = IMG_Load("png/piranha.png");
-    fishTextures[0] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[0] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/golden.png");
-    fishTextures[1] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[1] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/brown.png");
-    fishTextures[2] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[2] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/emerald.png");
-    fishTextures[3] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[3] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/green.png");
-    fishTextures[4] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[4] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/lavender.png");
-    fishTextures[5] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[5] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/olive.png");
-    fishTextures[6] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[6] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/orange.png");
-    fishTextures[7] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[7] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/purple.png");
-    fishTextures[8] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[8] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/red.png");
-    fishTextures[9] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[9] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/silver.png");
-    fishTextures[10] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[10] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/teal.png");
-    fishTextures[11] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    fishTextures[11] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/heart.png");
-    heartTexture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+    heartTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     for (int i = 0; i < 4; ++i)
     {
         std::string filename = "bmp/ripple" + std::to_string(i) + ".bmp";
         SDL_Surface *rippleSurf = SDL_LoadBMP(filename.c_str());
-        rippleTextures[i] = SDL_CreateTextureFromSurface(hardInterfaceRenderer, rippleSurf);
+        rippleTextures[i] = SDL_CreateTextureFromSurface(interfaceRenderer, rippleSurf);
         SDL_FreeSurface(rippleSurf);
     }
 }
@@ -345,8 +345,8 @@ void renderHardFishAndRipples()
         if (fishes[i].active)
         {
             SDL_RendererFlip flip = (fishes[i].direction == -1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-            SDL_RenderCopyEx(hardInterfaceRenderer, fishTextures[fishes[i].type], NULL, &fishes[i].rect, 0, NULL, flip);
-            SDL_RenderCopyEx(hardInterfaceRenderer, fishTextures[fishes[i].type], NULL, &fishes[i].rect, fishes[i].rotation, NULL, flip);
+            SDL_RenderCopyEx(interfaceRenderer, fishTextures[fishes[i].type], NULL, &fishes[i].rect, 0, NULL, flip);
+            SDL_RenderCopyEx(interfaceRenderer, fishTextures[fishes[i].type], NULL, &fishes[i].rect, fishes[i].rotation, NULL, flip);
         }
 
         if (fishes[i].rippleActive)
@@ -355,7 +355,7 @@ void renderHardFishAndRipples()
             if (frame < 4)
             {
                 SDL_Rect rippleRect = {fishes[i].baseX + 20, fishes[i].baseY + 10, 80, 80};
-                SDL_RenderCopy(hardInterfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
+                SDL_RenderCopy(interfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
             }
         }
     }
@@ -504,7 +504,7 @@ void handleHardFishClick(int x, int y)
 
 void initHardInterface()
 {
-    if (hardInterfaceWindow != nullptr)
+    if (interfaceWindow != nullptr)
         return;
 
     game_music = Mix_LoadMUS("music/game_music.mp3");
@@ -513,10 +513,10 @@ void initHardInterface()
     rightfish = Mix_LoadWAV("music/rightfish.wav");
     wrongfish = Mix_LoadWAV("music/wrongfish.wav");
 
-    hardInterfaceWindow = SDL_CreateWindow("Hard Mode",
+    interfaceWindow = SDL_CreateWindow("Hard Mode",
                                            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                            1280, 720, SDL_WINDOW_BORDERLESS);
-    hardInterfaceRenderer = SDL_CreateRenderer(hardInterfaceWindow, -1, SDL_RENDERER_ACCELERATED);
+    interfaceRenderer = SDL_CreateRenderer(interfaceWindow, -1, SDL_RENDERER_ACCELERATED);
 
     titleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 96);
     smalltitleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 64);
@@ -529,29 +529,29 @@ void initHardInterface()
     if (sunnyOn)
     {
         surf = SDL_LoadBMP("bmp/pond.bmp");
-        pondTexture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+        pondTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_FreeSurface(surf);
 
         surf = SDL_LoadBMP("bmp/pond2.bmp");
-        pond2Texture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+        pond2Texture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_FreeSurface(surf);
 
         surf = SDL_LoadBMP("bmp/mountain.bmp");
-        mountainTexture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+        mountainTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_FreeSurface(surf);
     }
     else if (!sunnyOn)
     {
         surf = SDL_LoadBMP("bmp/rainypond.bmp");
-        pondTexture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+        pondTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_FreeSurface(surf);
 
         surf = SDL_LoadBMP("bmp/rainypond2.bmp");
-        pond2Texture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+        pond2Texture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_FreeSurface(surf);
 
         surf = SDL_LoadBMP("bmp/rainymountain.bmp");
-        mountainTexture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+        mountainTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_FreeSurface(surf);
 
         initRain(500);
@@ -591,12 +591,12 @@ void initHardObjective()
 
 void renderHardInterface()
 {
-    if (!hardInterfaceRenderer || isPaused)
+    if (!interfaceRenderer || isPaused)
         return;
 
-    SDL_RenderCopy(hardInterfaceRenderer, pondTexture, NULL, &pond);
-    SDL_RenderCopy(hardInterfaceRenderer, pond2Texture, NULL, &pond2);
-    SDL_RenderCopy(hardInterfaceRenderer, mountainTexture, NULL, &mountain);
+    SDL_RenderCopy(interfaceRenderer, pondTexture, NULL, &pond);
+    SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
+    SDL_RenderCopy(interfaceRenderer, mountainTexture, NULL, &mountain);
 
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
@@ -608,12 +608,12 @@ void renderHardInterface()
 
     auto drawRoundedButton = [&](SDL_Rect rect, const std::string &text, SDL_Color fillColor, int radius, int alpha)
     {
-        roundedBoxRGBA(hardInterfaceRenderer,
+        roundedBoxRGBA(interfaceRenderer,
                        rect.x, rect.y,
                        rect.x + rect.w, rect.y + rect.h,
                        radius,
                        fillColor.r, fillColor.g, fillColor.b, alpha);
-        renderText(hardInterfaceRenderer, buttonFont, text, black, rect.x + rect.w / 2, rect.y + rect.h / 2);
+        renderText(interfaceRenderer, buttonFont, text, black, rect.x + rect.w / 2, rect.y + rect.h / 2);
     };
 
     SDL_Rect infoBox = {10, 10, 400, 200};
@@ -621,17 +621,17 @@ void renderHardInterface()
 
     std::string timerText = "Time: " + getFormattedTime();
     SDL_Surface *textSurface = TTF_RenderText_Solid(textFont, timerText.c_str(), black);
-    SDL_Texture *timerTexture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, textSurface);
+    SDL_Texture *timerTexture = SDL_CreateTextureFromSurface(interfaceRenderer, textSurface);
     SDL_Rect timerRect = {45, 15, textSurface->w, textSurface->h};
-    SDL_RenderCopy(hardInterfaceRenderer, timerTexture, NULL, &timerRect);
+    SDL_RenderCopy(interfaceRenderer, timerTexture, NULL, &timerRect);
     SDL_FreeSurface(textSurface);
     SDL_DestroyTexture(timerTexture);
 
     timerText = "Lives: ";
     textSurface = TTF_RenderText_Solid(textFont, timerText.c_str(), black);
-    timerTexture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, textSurface);
+    timerTexture = SDL_CreateTextureFromSurface(interfaceRenderer, textSurface);
     timerRect = {45, 45, textSurface->w, textSurface->h};
-    SDL_RenderCopy(hardInterfaceRenderer, timerTexture, NULL, &timerRect);
+    SDL_RenderCopy(interfaceRenderer, timerTexture, NULL, &timerRect);
     SDL_FreeSurface(textSurface);
     SDL_DestroyTexture(timerTexture);
 
@@ -639,14 +639,14 @@ void renderHardInterface()
     {
         int x = 130 + i * 30;
         SDL_Rect liveRect = {x, 45, 30, 30};
-        SDL_RenderCopy(hardInterfaceRenderer, heartTexture, NULL, &liveRect);
+        SDL_RenderCopy(interfaceRenderer, heartTexture, NULL, &liveRect);
     }
 
     timerText = "Score: " + std::to_string(fishScore) + ", Rem: " + std::to_string(targetScore);
     textSurface = TTF_RenderText_Solid(textFont, timerText.c_str(), black);
-    timerTexture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, textSurface);
+    timerTexture = SDL_CreateTextureFromSurface(interfaceRenderer, textSurface);
     timerRect = {45, 75, textSurface->w, textSurface->h};
-    SDL_RenderCopy(hardInterfaceRenderer, timerTexture, NULL, &timerRect);
+    SDL_RenderCopy(interfaceRenderer, timerTexture, NULL, &timerRect);
     SDL_FreeSurface(textSurface);
     SDL_DestroyTexture(timerTexture);
 
@@ -659,10 +659,10 @@ void renderHardInterface()
         int centerY = 95 + row * 33;
 
         SDL_Rect fishRect = {centerX, centerY, 60, 60};
-        SDL_RenderCopy(hardInterfaceRenderer, fishTextures[objectiveFishes[i].type], NULL, &fishRect);
+        SDL_RenderCopy(interfaceRenderer, fishTextures[objectiveFishes[i].type], NULL, &fishRect);
 
         std::string countText = "x " + std::to_string(objectiveFishes[i].count);
-        renderText(hardInterfaceRenderer, buttonFont, countText, black, centerX + 90, centerY + 25);
+        renderText(interfaceRenderer, buttonFont, countText, black, centerX + 90, centerY + 25);
     }
 
     renderHardFishAndRipples();
@@ -684,13 +684,13 @@ void renderHardInterface()
                 "      OBJECTIVES COMPLETED\nCatch as much as you can!!",
                 color,
                 0);
-            SDL_Texture *texture = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surface);
+            SDL_Texture *texture = SDL_CreateTextureFromSurface(interfaceRenderer, surface);
             int textW = surface->w;
             int textH = surface->h;
             SDL_FreeSurface(surface);
 
             int windowW, windowH;
-            SDL_GetRendererOutputSize(hardInterfaceRenderer, &windowW, &windowH);
+            SDL_GetRendererOutputSize(interfaceRenderer, &windowW, &windowH);
             float startY = windowH / 2.0f;
             float endY = windowH / 2.0f - 100;
             float yPos = startY + (endY - startY) * progress;
@@ -712,7 +712,7 @@ void renderHardInterface()
                 textW,
                 textH};
 
-            SDL_RenderCopy(hardInterfaceRenderer, texture, NULL, &dstRect);
+            SDL_RenderCopy(interfaceRenderer, texture, NULL, &dstRect);
             SDL_DestroyTexture(texture);
         }
     }
@@ -740,7 +740,7 @@ void renderHardInterface()
 
         // Render centered
         SDL_Surface *surf = TTF_RenderText_Blended(textFont, text.text.c_str(), renderColor);
-        SDL_Texture *tex = SDL_CreateTextureFromSurface(hardInterfaceRenderer, surf);
+        SDL_Texture *tex = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_Rect dst = {
             textX - surf->w / 2,
             textY - surf->h / 2,
@@ -748,7 +748,7 @@ void renderHardInterface()
             surf->h};
         SDL_FreeSurface(surf);
         SDL_SetTextureAlphaMod(tex, alpha);
-        SDL_RenderCopy(hardInterfaceRenderer, tex, NULL, &dst);
+        SDL_RenderCopy(interfaceRenderer, tex, NULL, &dst);
         SDL_DestroyTexture(tex);
 
         ++i;
@@ -763,8 +763,8 @@ void renderHardInterface()
     SDL_Color color1 = {255, 180, 100, 255};
     SDL_Color color2 = {255, 150, 0, 255};
     drawRoundedButton(pauseBtn, "", SDL_PointInRect(&mp, &pauseBtn) ? color1 : color2, 0, 255);
-    renderText(hardInterfaceRenderer, smalltitleFont, "| |", white, 1235, 52);
-    SDL_RenderPresent(hardInterfaceRenderer);
+    renderText(interfaceRenderer, smalltitleFont, "| |", white, 1235, 52);
+    SDL_RenderPresent(interfaceRenderer);
     if (!objectiveClose)
         renderHardObjective();
 }
@@ -914,10 +914,10 @@ void rendergameWin()
 
 void handleHardInterfaceEvents(SDL_Event &e, bool &interfaceOpen)
 {
-    if (!hardInterfaceWindow)
+    if (!interfaceWindow)
         return;
 
-    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(hardInterfaceWindow))
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(interfaceWindow))
     {
         int mouseX = e.button.x;
         int mouseY = e.button.y;
@@ -936,7 +936,7 @@ void handleHardInterfaceEvents(SDL_Event &e, bool &interfaceOpen)
         }
         SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
     }
-    if (e.type == SDL_KEYDOWN && e.window.windowID == SDL_GetWindowID(hardInterfaceWindow))
+    if (e.type == SDL_KEYDOWN && e.window.windowID == SDL_GetWindowID(interfaceWindow))
         {
             if (e.key.keysym.sym == SDLK_ESCAPE && !isPaused)
             {
@@ -1030,7 +1030,7 @@ void handleHardInterfaceEvents(SDL_Event &e, bool &interfaceOpen)
 
 void handleHardInterfaceLogics()
 {
-    if (!hardInterfaceWindow || isPaused)
+    if (!interfaceWindow || isPaused)
         return;
 
     spawnHardFish();
@@ -1140,20 +1140,20 @@ void destroyHardInterface()
     Mix_FreeChunk(rightfish);
     Mix_FreeChunk(wrongfish);
     if (!sunnyOn) destroyRain();
-    if (hardInterfaceRenderer)
+    if (interfaceRenderer)
     {
-        SDL_DestroyRenderer(hardInterfaceRenderer);
-        hardInterfaceRenderer = nullptr;
+        SDL_DestroyRenderer(interfaceRenderer);
+        interfaceRenderer = nullptr;
     }
-    if (hardInterfaceWindow)
+    if (interfaceWindow)
     {
-        SDL_DestroyWindow(hardInterfaceWindow);
-        hardInterfaceWindow = nullptr;
+        SDL_DestroyWindow(interfaceWindow);
+        interfaceWindow = nullptr;
     }
     hardinterfaceOpen = false;
 }
 
 bool isHardInterfaceOpen()
 {
-    return hardInterfaceWindow != nullptr;
+    return interfaceWindow != nullptr;
 }
