@@ -38,7 +38,7 @@ static bool verdict = false;
 
 void initGameOver()
 {
-    if (!gameOverWindow)
+    if (gameOverWindow != nullptr)
         return;
 
     gameOverWindow = SDL_CreateWindow("Game Over",
@@ -65,9 +65,8 @@ void initGameOver()
 
 void renderGameOver()
 {
-    if (!gameOverRenderer)
-        return;
-
+    if (!gameOverRenderer) return;
+    std::cout << "point crossed\n";
     SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
     SDL_RenderClear(gameOverRenderer);
 
@@ -156,12 +155,30 @@ void renderGameOver()
             renderText(gameOverRenderer, messageFont, "Underscores (_) allowed. No spaces!", white, 400, 350);
         }
     }
+    else
+    {
+        renderText(gameOverRenderer, titleFont, "Oops!", white, 400, 80);
+
+        int mx, my;
+        SDL_GetMouseState(&mx, &my);
+        SDL_Point mousePoint = {mx, my};
+
+        conf = "Exit";
+        Button confirmBtn = {confirmButton, conf, false};
+        confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
+
+        drawParallelogram(gameOverRenderer, confirmBtn, confirmBtn.hovered);
+        renderText(gameOverRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
+
+        renderText(gameOverRenderer, textFont, "Under Construction!", white, 400, 150);
+
+    }
     SDL_RenderPresent(gameOverRenderer);
 }
 
 void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
 {
-    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gamewinWindow))
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
     {
         if (gameoverOpen && verdict)
         {
@@ -182,6 +199,18 @@ void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
             {
                 finalText = checkAndAddHighScore("files/hard.txt", userInput, fishScore);
             }
+            SDL_Rect backBtnRect = {300, 380, 200, 60};
+            SDL_GetMouseState(&mx, &my);
+            SDL_Point mousePoint = {mx, my};
+            if (SDL_PointInRect(&mousePoint, &backBtnRect) && conf == "Exit")
+            {
+                destroyGameOver();
+            }
+        }
+        if (gameoverOpen)
+        {
+            int mx = e.button.x;
+            int my = e.button.y;
             SDL_Rect backBtnRect = {300, 380, 200, 60};
             SDL_GetMouseState(&mx, &my);
             SDL_Point mousePoint = {mx, my};
@@ -240,6 +269,12 @@ void destroyGameOver()
         TTF_CloseFont(messageFont);
         messageFont = nullptr;
     }
+    userInput = "";
+    finalText = "";
+    conf = "";
+    inputActive = false;
+    showCursor = true;
+    lastCursorToggle = 0;
     gameoverOpen = false;
     verdict = false;
     interface = "";

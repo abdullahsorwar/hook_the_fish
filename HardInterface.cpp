@@ -51,7 +51,7 @@ static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
 static bool congratulationsFlag = false;
-static const Uint32 TIMER_DURATION = 120000;
+static const Uint32 TIMER_DURATION = 5000;
 bool hardinterfaceOpen = false;
 
 struct PondFish
@@ -82,7 +82,7 @@ struct FloatingText
 ObjectiveFish objectiveFishes[6] = {0};
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
-static Uint32 remaining = 120000;
+static Uint32 remaining = 5000;
 static std::vector<int> availableTypes(10);
 static std::vector<FloatingText> floatingTexts;
 
@@ -276,7 +276,7 @@ void spawnHardFish()
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
-            int type = rand() % 12;
+            int type = availableTypes[i-2];
 
             fishes[i].arcHeight = rand() % 60 + 70;
             fishes[i].rect.x = fishes[i].baseX;
@@ -431,12 +431,12 @@ void handleHardFishClick(int x, int y)
                     {
                         fishScore++;
                         targetScore--;
-                        objectiveFishes[j].count--;
-                        fishes[i].clicked = true;
                         renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
                         floatingTexts.back().position = {
                             fishes[i].rect.x + fishes[i].rect.w / 2,
                             fishes[i].rect.y - 20};
+                        objectiveFishes[j].count--;
+                        fishes[i].clicked = true;
                         if (soundOn)
                             Mix_PlayChannel(-1, rightfish, 0);
                         if (targetScore == 0)
@@ -861,6 +861,10 @@ void handleHardInterfaceEvents(SDL_Event &e, bool &interfaceOpen)
         renderPauseMenu();
         handlePauseMenuEvents(e, isPaused);
     }
+    if (gameoverOpen)
+    {
+        handleGameOverEvents(e, gameoverOpen);
+    }
 }
 
 void handleHardInterfaceLogics()
@@ -882,16 +886,16 @@ void handleHardInterfaceLogics()
 
     if (remaining == 0)
     {
-        if (targetScore == 0 && !gameoverOpen)
+        if (!gameoverOpen)
         {
             initGameOver();
             gameoverOpen = true;
         }
-        if (targetScore != 0)
+        /*if (targetScore != 0)
         {
             destroyHardInterface();
             timerRunning = false;
-        }
+        }*/
     }
 }
 
@@ -962,7 +966,7 @@ void destroyHardInterface()
     {
         fishes[i] = PondFish();
     }
-    remaining = 120000;
+    remaining = 5000;
     Mix_FreeChunk(bonuscatch);
     Mix_FreeChunk(crocodile);
     Mix_FreeChunk(rightfish);
