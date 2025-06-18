@@ -1,15 +1,34 @@
 #ifndef GAMEOVER_H
-#define GAMEOVER
+#define GAMEOVER_H
 
 #include <SDL2/SDL.h>
-#include <stdbool.h>
+#include <SDL2/SDL_ttf.h>
+#include <string>
+#include <vector>
 
-void initGameOver();
-void handleGameOverEvents(SDL_Event& e, bool& GameOverOpen);
-void renderGameOver();
-void destroyGameOver();
-bool isGameOverOpen();
-extern bool GameOverOpen;
-extern SDL_Renderer* GameOverRenderer;
+struct HighScoreEntry {
+    std::string name;
+    int score;
+};
+
+enum GameOverReason {
+    OUT_OF_LIVES,
+    OUT_OF_TIME,
+    LOW_SCORE,
+    HIGH_SCORE
+};
+
+struct GameOverState {
+    GameOverReason reason;
+    int score;
+    std::string playerName;
+    bool nameEntered;
+    bool active;
+};
+
+void initGameOver(GameOverState& state, int score, int lives, int timeRemaining, bool objectivesCompleted, const std::vector<HighScoreEntry>& highScores);
+
+void handleGameOverInput(SDL_Event& e, GameOverState& state, std::vector<HighScoreEntry>& highScores);
+void renderGameOverScreen(SDL_Renderer* renderer, TTF_Font* font, const GameOverState& state);
 
 #endif

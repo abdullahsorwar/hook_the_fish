@@ -1,128 +1,99 @@
 #include "GameOver.h"
-#include "MediumInterface.h"
-#include "NewGame.h"
-#include "Common.h"
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
-#include <fstream>
-#include <sstream>
+#include <iostream>
 
-SDL_Window* GameOverWindow = nullptr;
-SDL_Renderer* GameOverRenderer = nullptr;
-static TTF_Font* TextFont = nullptr;
-static TTF_Font* titleFont = nullptr;
-static TTF_Font* buttonFont = nullptr;
-static SDL_Rect ContinueBtn = {300, 380, 200, 60};
-static std::string GameOverText;
-bool GameOverOpen;
+void initGameOver(GameOverState& state, int score, int lives, int timeRemaining, bool objectivesCompleted, const std::vector<HighScoreEntry>& highScores) {
+    state.score = score;
+    state.playerName = "";
+    state.nameEntered = false;
+    state.active = true;
 
-std::string TextFile;
-
-std::string loadGameOverContent(const std::string& path) {
-    if(isLifeLost){
-        TextFile = "texts/LifeLost.txt";
-    }
-    else if(!timerRunning){
-        TextFile = "texts/TimeLost.txt";
-    }
-    std::ifstream file(path);
-    if (!file.is_open()) return "Failed to load " + path;
-
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
-
-void initGameOver() {
-    if (GameOverWindow != nullptr) return;
-
-    GameOverWindow = SDL_CreateWindow("GameOver", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_BORDERLESS);
-    GameOverRenderer = SDL_CreateRenderer(GameOverWindow, -1, SDL_RENDERER_ACCELERATED);
-
-    GameOverText = loadGameOverContent(TextFile);
-    titleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 96);
-    buttonFont = TTF_OpenFont("fonts/OpenSans-Bold.ttf", 32);
-    TextFont = TTF_OpenFont("fonts/ShareTech-Regular.ttf", 40);
-    if (!titleFont || !buttonFont) {
-      SDL_Log("Failed to load font: %s", TTF_GetError());
-    }
-    
-}
-
-void handleGameOverEvents(SDL_Event& e, bool& GameOverOpen) {
-    if (!GameOverWindow || e.window.windowID != SDL_GetWindowID(GameOverWindow)) return;
-
-    if (e.type == SDL_WINDOWEVENT) {
-        if (e.window.event == SDL_WINDOWEVENT_CLOSE) {
-            GameOverOpen = false;
-            destroyGameOver();
+    if (lives <= 0) {
+        state.reason = OUT_OF_LIVES;
+    } else if (timeRemaining <= 0 && !objectivesCompleted) {
+        state.reason = OUT_OF_TIME;
+    } else if (objectivesCompleted) {
+        bool qualifies = false;
+        for (const auto& entry : highScores) {
+            if (score > entry.score) {
+                qualifies = true;
+                break;
+            }
         }
-    }
-
-    if (e.type == SDL_MOUSEBUTTONDOWN) {
-        SDL_Point mp = {e.button.x, e.button.y};
-
-        if (SDL_PointInRect(&mp, &ContinueBtn)) {
-            GameOverOpen = false;
-
-            // Destroy Game Over Screen
-            destroyGameOver();
-            destroyMediumInterface();
+        if (qualifies || highScores.size() < 5) {
+            state.reason = HIGH_SCORE;
+        } else {
+            state.reason = LOW_SCORE;
         }
     }
 }
 
+void handleGameOverInput(SDL_Event& e, GameOverState& state, std::vector<HighScoreEntry>& highScores) {
+    if (!state.active) return;
 
-void renderGameOver() {
-    if (!GameOverRenderer) return;
+    if (state.reason == HIGH_SCORE) {
+        if (e.type == SDL_TEXTINPUT && state.playerName.length() < 18) {
+            state.playerName += e.text.text;
+        } else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_BACKSPACE && !state.playerName.empty()) {
+            state.playerName.pop_back();
+        } else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_RETURN && !state.nameEntered) {
+            highScores.push_back({state.playerName, state.score});
+            state.nameEntered = true;
+            state.active = false;  // optionally deactivate screen
+        }
+    } else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_RETURN) {
+        state.active = false;
+    }
+}
 
-    SDL_SetRenderDrawColor(GameOverRenderer, 255, 0, 0, 255);
-    SDL_RenderClear(GameOverRenderer);
-    
+void renderGameOverScreen(SDL_Renderer* renderer, TTF_Font* font, const GameOverState& state) {
+    if (!state.active) return;
+
     SDL_Color white = {255, 255, 255, 255};
-    SDL_Color black = {0, 0, 0, 255};
-    
-    renderText(GameOverRenderer, titleFont, "GAMEOVER", black, 400, 80);
-    
-    renderWrappedText(GameOverRenderer, TextFont, GameOverText.c_str(), black, 420, 200, 700);
-    
-    int mx, my;
-    SDL_GetMouseState(&mx, &my);
-    SDL_Point mousePoint = {mx, my};
+    SDL_Color yellow = {255, 255, 0, 255};
+    SDL_Color red = {255, 0, 0, 255};
 
-    Button back = {ContinueBtn, "Continue", false};
-    back.hovered = SDL_PointInRect(&mousePoint, &back.rect);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
 
-    drawParallelogram(GameOverRenderer, back, back.hovered);
-    renderText(GameOverRenderer, buttonFont, back.text, white, back.rect.x + back.rect.w / 2, back.rect.y + back.rect.h / 2);
+    std::string message;
+    switch (state.reason) {
+        case OUT_OF_LIVES: message = "Oops! Your Lives Are Over"; break;
+        case OUT_OF_TIME: message = "Oops! Your Time Has Run Out"; break;
+        case LOW_SCORE: message = "Uh Oh! You Couldn't Make It To The High Scores"; break;
+        case HIGH_SCORE: message = "Congratulations! You've Entered The Top 5"; break;
+    }
 
-    SDL_RenderPresent(GameOverRenderer);
+    SDL_Surface* msgSurface = TTF_RenderText_Solid(font, message.c_str(), white);
+    SDL_Texture* msgTexture = SDL_CreateTextureFromSurface(renderer, msgSurface);
+    SDL_Rect msgRect = {100, 100, msgSurface->w, msgSurface->h};
+    SDL_RenderCopy(renderer, msgTexture, NULL, &msgRect);
+    SDL_FreeSurface(msgSurface);
+    SDL_DestroyTexture(msgTexture);
+
+    std::string scoreText = "Your Score is : " + std::to_string(state.score);
+    SDL_Surface* scoreSurface = TTF_RenderText_Solid(font, scoreText.c_str(), yellow);
+    SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
+    SDL_Rect scoreRect = {100, 150, scoreSurface->w, scoreSurface->h};
+    SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreRect);
+    SDL_FreeSurface(scoreSurface);
+    SDL_DestroyTexture(scoreTexture);
+
+    if (state.reason == HIGH_SCORE && !state.nameEntered) {
+        SDL_Surface* namePrompt = TTF_RenderText_Solid(font, "Enter Your Name:", white);
+        SDL_Texture* nameTexture = SDL_CreateTextureFromSurface(renderer, namePrompt);
+        SDL_Rect nameRect = {100, 220, namePrompt->w, namePrompt->h};
+        SDL_RenderCopy(renderer, nameTexture, NULL, &nameRect);
+        SDL_FreeSurface(namePrompt);
+        SDL_DestroyTexture(nameTexture);
+
+        std::string typed = state.playerName + "|";
+        SDL_Surface* inputSurface = TTF_RenderText_Solid(font, typed.c_str(), red);
+        SDL_Texture* inputTexture = SDL_CreateTextureFromSurface(renderer, inputSurface);
+        SDL_Rect inputRect = {100, 260, inputSurface->w, inputSurface->h};
+        SDL_RenderCopy(renderer, inputTexture, NULL, &inputRect);
+        SDL_FreeSurface(inputSurface);
+        SDL_DestroyTexture(inputTexture);
+    }
+
+    SDL_RenderPresent(renderer);
 }
-
-void destroyGameOver() {
-    if (titleFont) {
-        TTF_CloseFont(titleFont);
-        titleFont = nullptr;
-    }
-    if (buttonFont) {
-        TTF_CloseFont(buttonFont);
-        buttonFont = nullptr;
-    }
-    if (TextFont) {
-        TTF_CloseFont(TextFont);
-        TextFont = nullptr;
-    }
-    if (GameOverRenderer) {
-        SDL_DestroyRenderer(GameOverRenderer);
-        GameOverRenderer = nullptr;
-    }
-    if (GameOverWindow) {
-        SDL_DestroyWindow(GameOverWindow);
-        GameOverWindow = nullptr;
-    }
-}
-
-bool isGameOverOpen() {
-    return GameOverWindow != nullptr;
-}
-
