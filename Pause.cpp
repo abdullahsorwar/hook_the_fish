@@ -2,6 +2,7 @@
 #include "Pause.h"
 #include "HardInterface.h"
 #include "MediumInterface.h"
+#include "EasyInterface.h"
 #include "GameRules.h"
 #include "Settings.h"
 #include <SDL2/SDL.h>
@@ -327,6 +328,7 @@ void handlePauseExitEvents(SDL_Event& e, bool& isExit) {
             destroyPauseMenu();
             if (hardinterfaceOpen) destroyHardInterface();
             if (MediuminterfaceOpen) destroyMediumInterface();
+            if (EasyinterfaceOpen) destroyEasyInterface();
         }
     }
 }
