@@ -2,6 +2,7 @@
 #include "NewGame.h"
 #include "MediumInterface.h"
 #include "HardInterface.h"
+#include "EasyInterface.h"
 #include "Pause.h"
 #include "Settings.h"
 #include "HighScores.h"
@@ -161,6 +162,9 @@ int main(int argc, char* argv[])
             if (MediuminterfaceOpen){
                 handleMediumInterfaceEvents(e, MediuminterfaceOpen);
             }
+            if (EasyinterfaceOpen){
+                handleEasyInterfaceEvents(e, EasyinterfaceOpen);
+            }
         }
 
         updateClouds(clouds);
@@ -226,6 +230,13 @@ int main(int argc, char* argv[])
         }
         if (MediuminterfaceOpen && objectiveClose) {
             handleMediumInterfaceLogics(e, MediuminterfaceOpen);
+        }
+        if (EasyinterfaceOpen)
+        {
+            renderEasyInterface();
+        }
+        if (EasyinterfaceOpen && objectiveClose) {
+            handleEasyInterfaceLogics();
         }
         SDL_Delay(16);
     }
