@@ -1,1 +1,1 @@
-g++ main.cpp Common.cpp Exit.cpp Settings.cpp HighScores.cpp GameRules.cpp Controls.cpp Weather.cpp NewGame.cpp HardInterface.cpp MediumInterface.cpp Loading.cpp -o Game -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lSDL2_gfx -ldl
+g++ main.cpp Common.cpp Exit.cpp Settings.cpp HighScores.cpp GameRules.cpp Controls.cpp Weather.cpp NewGame.cpp HardInterface.cpp MediumInterface.cpp EasyInterface.cpp Loading.cpp Pause.cpp Rain.cpp GameOver.cpp -o Game -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lSDL2_gfx -ldl
