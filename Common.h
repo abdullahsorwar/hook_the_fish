@@ -79,6 +79,7 @@ extern SDL_Renderer* interfaceRenderer;
 //extern SDL_Window* mediumInterfaceWindow;
 extern SDL_Window* objectiveWindow;
 extern SDL_Window* gamewinWindow;
+extern SDL_Window *gameOverWindow;
 extern SDL_Window* pauseWindow;
 extern SDL_Window* pauseExitWindow;
 extern SDL_Window* pauseObjectiveWindow;
@@ -88,5 +89,8 @@ extern bool hardinterfaceOpen;
 extern bool MediuminterfaceOpen;
 extern bool EasyinterfaceOpen;
 extern bool objectiveClose;
+extern bool gameoverOpen;
+extern int fishScore;
+extern int targetScore;
 
 #endif

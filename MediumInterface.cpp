@@ -39,7 +39,7 @@ static std::vector<SDL_Texture*> fishTextures, objectiveTextures, rippleTextures
 
 static TTF_Font* titleFont = nullptr, *buttonFont = nullptr, *textFont = nullptr;
 
-static int fishScore = 0, targetScore = 0, lives = 3;
+static int lives = 3;
 uint32_t timerStartTime = 0;
 bool timerRunning = false;
 static const Uint32 TIMER_DURATION = 120000;
@@ -82,17 +82,17 @@ std::string getMediumFormattedTime() {
     if (elapsed >= 120000) {
         elapsed = 120000;  
         timerRunning = false;  
-        GameOverOpen = true;  
+        //gameOverOpen = true;  
         // Add game over logic here if needed
-        initGameOver();  
-        if(GameOverOpen){
+        //initGameOver();  
+        /*if(GameOverOpen){
             SDL_Event e;
             while(SDL_PollEvent(&e)){
                 handleGameOverEvents(e, GameOverOpen);
             }
             renderGameOver();
             SDL_Delay(16);    
-        }
+        }*/
     }
 
     int remainingTime = 120000 - elapsed;  
@@ -277,16 +277,16 @@ void handleMediumFishClick(int x, int y) {
                 lives--;  // Decrease life by 1
                 if (lives == 0) {
                     isLifeLost = true;
-                    GameOverOpen = true;
-                    initGameOver();
-                    if (GameOverOpen) {
+                    //GameOverOpen = true;
+                    //initGameOver();
+                    /*if (GameOverOpen) {
                         SDL_Event e;
                         while (SDL_PollEvent(&e)) {
                             handleGameOverEvents(e, GameOverOpen);
                         }
                         renderGameOver();
                         SDL_Delay(16);
-                    }
+                    }*/
                 }
                 fishes[i].clicked = true;
             }

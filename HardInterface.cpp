@@ -3,6 +3,7 @@
 #include "HighScores.h"
 #include "Pause.h"
 #include "Rain.h"
+#include "GameOver.h"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <fstream>
@@ -21,8 +22,6 @@
 static SDL_Rect pond = {0, 250, 1280, 470};
 static SDL_Rect pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250};
-static SDL_Rect inputBox = {250, 200, 300, 50};
-static SDL_Rect confirmButton = {300, 380, 200, 60};
 static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 
 //SDL_Window *interfaceWindow = nullptr;
@@ -47,8 +46,6 @@ static TTF_Font *textFont = nullptr;
 static TTF_Font *typeFont = nullptr;
 static TTF_Font *messageFont = nullptr;
 
-static int fishScore = 0;
-static int targetScore = 0;
 static int lives = 3;
 static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
@@ -56,14 +53,6 @@ static bool timerRunning = false;
 static bool congratulationsFlag = false;
 static const Uint32 TIMER_DURATION = 120000;
 bool hardinterfaceOpen = false;
-
-std::string userInput = "";
-std::string finalText = "";
-std::string conf = "";
-static bool inputActive = false;
-static bool showCursor = true;
-static bool gamewinOpen = false;
-static Uint32 lastCursorToggle = 0;
 
 struct PondFish
 {
@@ -753,9 +742,9 @@ void renderHardInterface()
 
         ++i;
     }
-    if (gamewinOpen && targetScore == 0)
+    if (gameoverOpen)
     {
-        rendergameWin();
+        renderGameOver();
     }
     int mx, my;
     SDL_GetMouseState(&mx, &my);
@@ -806,110 +795,6 @@ void renderHardObjective()
         renderText(objectiveRenderer, buttonFont, countText, black, centerX + 35, centerY - 5);
     }
     SDL_RenderPresent(objectiveRenderer);
-}
-
-void initgameWin()
-{
-    if (gamewinWindow != nullptr)
-        return;
-
-    gamewinWindow = SDL_CreateWindow("Winner!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
-    gamewinRenderer = SDL_CreateRenderer(gamewinWindow, -1, SDL_RENDERER_ACCELERATED);
-
-    typeFont = TTF_OpenFont("fonts/Arial.ttf", 24);
-    SDL_StartTextInput();
-}
-
-void rendergameWin()
-{
-    if (!gamewinRenderer)
-        return;
-
-    SDL_SetRenderDrawColor(gamewinRenderer, 20, 20, 40, 255);
-    SDL_RenderClear(gamewinRenderer);
-
-    SDL_Color white = {255, 255, 255, 255};
-    SDL_Color black = {0, 0, 0, 255};
-    renderText(gamewinRenderer, smalltitleFont, "Congratulations!", white, 400, 80);
-
-    int mx, my;
-    SDL_GetMouseState(&mx, &my);
-    SDL_Point mousePoint = {mx, my};
-
-    conf = (finalText == "0") ? "Exit" : "Confirm";
-    Button confirmBtn = {confirmButton, conf, false};
-    confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
-
-    drawParallelogram(gamewinRenderer, confirmBtn, confirmBtn.hovered);
-    renderText(gamewinRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
-
-    auto drawRoundedButton = [&](SDL_Rect rect, const std::string &text, SDL_Color fillColor)
-    {
-        int radius = 5;
-        roundedBoxRGBA(gamewinRenderer,
-                       rect.x, rect.y,
-                       rect.x + rect.w, rect.y + rect.h,
-                       radius,
-                       fillColor.r, fillColor.g, fillColor.b, 100);
-        renderText(gamewinRenderer, buttonFont, text, black, rect.x + rect.w / 2, rect.y + rect.h / 2);
-    };
-    SDL_Color faded = {255, 255, 255, 255};
-    drawRoundedButton(inputBox, "", faded);
-
-    if (SDL_GetTicks() - lastCursorToggle > 500)
-    {
-        showCursor = !showCursor;
-        lastCursorToggle = SDL_GetTicks();
-    }
-
-    renderText(gamewinRenderer, textFont, "Enter your name: ", white, 400, 150);
-
-    // --- Centered and Scrolling Text ---
-    std::string displayText = userInput;
-    if (inputActive && showCursor)
-    {
-        displayText += "|";
-    }
-
-    // Measure full text width
-    int textWidth = 0, textHeight = 0;
-    TTF_SizeText(typeFont, displayText.c_str(), &textWidth, &textHeight);
-
-    // Scroll if text is wider than box
-    int maxVisibleWidth = inputBox.w - 20;
-    std::string visibleText = displayText;
-    while (!visibleText.empty())
-    {
-        TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, nullptr);
-        if (textWidth <= maxVisibleWidth)
-            break;
-        visibleText.erase(0, 1); // Scroll left
-    }
-
-    // Center visible text inside inputBox
-    TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, &textHeight);
-    int textX = inputBox.x + inputBox.w / 2;
-    int textY = inputBox.y + inputBox.h / 2;
-
-    // Render the user input
-    renderText(gamewinRenderer, typeFont, visibleText, white, textX, textY);
-
-    // Success message
-    if (finalText == "0")
-    {
-        renderText(gamewinRenderer, messageFont, "Entry Successful!", white, 400, 300);
-    }
-    else if (finalText == "18")
-    {
-        renderText(gamewinRenderer, messageFont, "Invalid name: must not exceed 18 characters.", white, 400, 300);
-    }
-    else if (finalText == "-1")
-    {
-        renderText(gamewinRenderer, messageFont, "Invalid name: Only A-Z, a-z, 0-9, and", white, 400, 300);
-        renderText(gamewinRenderer, messageFont, "Underscores (_) allowed. No spaces!", white, 400, 350);
-    }
-
-    SDL_RenderPresent(gamewinRenderer);
 }
 
 void handleHardInterfaceEvents(SDL_Event &e, bool &interfaceOpen)
@@ -971,56 +856,6 @@ void handleHardInterfaceEvents(SDL_Event &e, bool &interfaceOpen)
             SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
         }
     }
-    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gamewinWindow))
-    {
-        if (gamewinOpen)
-        {
-            int mx = e.button.x;
-            int my = e.button.y;
-            if (mx >= inputBox.x && mx <= inputBox.x + inputBox.w &&
-                my >= inputBox.y && my <= inputBox.y + inputBox.h)
-            {
-                inputActive = true;
-            }
-            else
-            {
-                inputActive = false;
-            }
-
-            if (mx >= confirmButton.x && mx <= confirmButton.x + confirmButton.w &&
-                my >= confirmButton.y && my <= confirmButton.y + confirmButton.h && conf == "Confirm")
-            {
-                finalText = checkAndAddHighScore("files/hard.txt", userInput, fishScore);
-            }
-            SDL_Rect backBtnRect = {300, 380, 200, 60};
-            SDL_GetMouseState(&mx, &my);
-            SDL_Point mousePoint = {mx, my};
-            if (SDL_PointInRect(&mousePoint, &backBtnRect) && conf == "Exit")
-            {
-                SDL_DestroyRenderer(gamewinRenderer);
-                SDL_DestroyWindow(gamewinWindow);
-                gamewinOpen = false;
-                gamewinRenderer = nullptr;
-                gamewinWindow = nullptr;
-                destroyHardInterface();
-            }
-        }
-    }
-    if (gamewinOpen)
-    {
-        if (e.type == SDL_TEXTINPUT && inputActive)
-        {
-            userInput += e.text.text;
-        }
-
-        if (e.type == SDL_KEYDOWN && inputActive)
-        {
-            if (e.key.keysym.sym == SDLK_BACKSPACE && !userInput.empty())
-            {
-                userInput.pop_back();
-            }
-        }
-    }
     if (isPaused)
     {
         renderPauseMenu();
@@ -1047,12 +882,12 @@ void handleHardInterfaceLogics()
 
     if (remaining == 0)
     {
-        if (targetScore == 0 && !gamewinOpen)
+        if (targetScore == 0 && !gameoverOpen)
         {
-            initgameWin();
-            gamewinOpen = true;
+            initGameOver();
+            gameoverOpen = true;
         }
-        else if (targetScore != 0)
+        if (targetScore != 0)
         {
             destroyHardInterface();
             timerRunning = false;
@@ -1127,13 +962,6 @@ void destroyHardInterface()
     {
         fishes[i] = PondFish();
     }
-    userInput = "";
-    finalText = "";
-    conf = "";
-    inputActive = false;
-    showCursor = true;
-    gamewinOpen = false;
-    lastCursorToggle = 0;
     remaining = 120000;
     Mix_FreeChunk(bonuscatch);
     Mix_FreeChunk(crocodile);

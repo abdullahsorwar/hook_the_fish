@@ -60,6 +60,14 @@ void loadScoresFromFile(const std::string& filename) {
         }
     }
 }
+
+bool checkHighScore(const std::string& filename, int newScore)
+{
+    loadScoresFromFile(filename);
+    if (loadedScores.size() < 5 || newScore > loadedScores.back().second) return true;
+    else return false;
+}
+
 std::string checkAndAddHighScore(const std::string& filename, const std::string& playerName, int newScore) {
 
     if (playerName.length() > 18) {

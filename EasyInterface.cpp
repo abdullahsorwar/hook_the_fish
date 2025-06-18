@@ -52,9 +52,6 @@ static TTF_Font* textFont = nullptr;
 static TTF_Font* typeFont = nullptr;
 static TTF_Font* messageFont = nullptr;
 
-// Game state variables
-static int fishScore = 0;
-static int targetScore = 0;
 //static int lives = 3;
 static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;

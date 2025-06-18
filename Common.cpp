@@ -14,6 +14,8 @@ SDL_Texture* copyright = nullptr;
 SDL_Texture* rodTexture = nullptr;
 SDL_Window *interfaceWindow = nullptr;
 SDL_Renderer *interfaceRenderer = nullptr;
+int fishScore = 0;
+int targetScore = 0;
 
 Mix_Music* intro = nullptr;
 Mix_Music* game_music = nullptr;
