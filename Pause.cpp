@@ -326,7 +326,6 @@ void handlePauseExitEvents(SDL_Event& e, bool& isExit) {
             destroyPauseExit();
             destroyPauseMenu();
             if (hardinterfaceOpen) destroyHardInterface();
-            if (MediuminterfaceOpen) destroyMediumInterface();
         }
     }
 }

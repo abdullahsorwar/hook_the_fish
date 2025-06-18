@@ -12,8 +12,6 @@ SDL_Texture* hookleftTexture = nullptr;
 SDL_Texture* hookrightTexture = nullptr;
 SDL_Texture* copyright = nullptr;
 SDL_Texture* rodTexture = nullptr;
-SDL_Window *interfaceWindow = nullptr;
-SDL_Renderer *interfaceRenderer = nullptr;
 
 Mix_Music* intro = nullptr;
 Mix_Music* game_music = nullptr;

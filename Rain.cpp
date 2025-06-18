@@ -136,14 +136,14 @@ void renderRain()
 {
     if (thunderActive)
     {
-        SDL_SetRenderDrawColor(interfaceRenderer, 230, 230, 255, 255);
-        SDL_RenderClear(interfaceRenderer);
+        SDL_SetRenderDrawColor(hardInterfaceRenderer, 230, 230, 255, 255);
+        SDL_RenderClear(hardInterfaceRenderer);
     }
 
-    SDL_SetRenderDrawColor(interfaceRenderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(hardInterfaceRenderer, 255, 255, 255, 255);
     for (auto &drop : raindrops)
     {
-        SDL_RenderDrawLine(interfaceRenderer,
+        SDL_RenderDrawLine(hardInterfaceRenderer,
                            static_cast<int>(drop.x),
                            static_cast<int>(drop.y),
                            static_cast<int>(drop.x + drop.tilt),
@@ -151,19 +151,19 @@ void renderRain()
     }
 
     // Draw lightning bolts
-    SDL_SetRenderDrawColor(interfaceRenderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(hardInterfaceRenderer, 255, 255, 255, 255);
     for (auto &bolt : lightnings)
     {
         for (size_t i = 1; i < bolt.points.size(); ++i)
         {
-            SDL_RenderDrawLine(interfaceRenderer,
+            SDL_RenderDrawLine(hardInterfaceRenderer,
                                bolt.points[i - 1].x, bolt.points[i - 1].y,
                                bolt.points[i].x, bolt.points[i].y);
         }
     }
 
     // Draw splashes
-    SDL_SetRenderDrawColor(interfaceRenderer, 180, 180, 255, 255);
+    SDL_SetRenderDrawColor(hardInterfaceRenderer, 180, 180, 255, 255);
     for (auto &splash : splashes)
     {
         for (int angle = 0; angle < 360; angle += 30)
@@ -171,7 +171,7 @@ void renderRain()
             float rad = angle * M_PI / 180.0f;
             int x = static_cast<int>(splash.x + splash.radius * cos(rad));
             int y = static_cast<int>(splash.y + splash.radius * sin(rad));
-            SDL_RenderDrawPoint(interfaceRenderer, x, y);
+            SDL_RenderDrawPoint(hardInterfaceRenderer, x, y);
         }
     }
 }
