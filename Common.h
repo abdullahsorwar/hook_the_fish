@@ -29,6 +29,11 @@ struct Fish {
     bool hovered = false;
 };
 
+struct ObjectiveFish {
+    int type;
+    int count;
+};
+
 void drawPondBackground(SDL_Renderer* renderer, int width, int height);
 void drawParallelogram(SDL_Renderer* renderer, Button& btn, bool hovered);
 void renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);
@@ -92,5 +97,6 @@ extern bool objectiveClose;
 extern bool gameoverOpen;
 extern int fishScore;
 extern int targetScore;
+extern ObjectiveFish objectiveFishes[];
 
 #endif

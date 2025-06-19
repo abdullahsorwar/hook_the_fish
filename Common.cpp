@@ -16,6 +16,7 @@ SDL_Window *interfaceWindow = nullptr;
 SDL_Renderer *interfaceRenderer = nullptr;
 int fishScore = 0;
 int targetScore = 0;
+ObjectiveFish objectiveFishes[6] = {0};
 
 Mix_Music* intro = nullptr;
 Mix_Music* game_music = nullptr;

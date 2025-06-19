@@ -62,12 +62,7 @@ struct PondFish {
     bool clicked;
 };
 
-struct ObjectiveFish {
-    int type;
-    int count;
-};
-
-static ObjectiveFish objectiveFishes[4];
+//static ObjectiveFish objectiveFishes[4];
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 static std::vector<int> availableTypes;

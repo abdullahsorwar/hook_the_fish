@@ -4,12 +4,6 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-struct ObjectiveFish {
-    int type;
-    int count;
-};
-
-extern ObjectiveFish objectiveFishes[];
 //extern SDL_Renderer* hardInterfaceRenderer;
 
 void loadHardFishAssets();

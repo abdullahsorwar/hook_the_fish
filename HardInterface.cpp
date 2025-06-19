@@ -79,7 +79,6 @@ struct FloatingText
     int duration = 1000;
 };
 
-ObjectiveFish objectiveFishes[6] = {0};
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 static Uint32 remaining = 120000;

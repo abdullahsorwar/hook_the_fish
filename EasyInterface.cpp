@@ -3,6 +3,7 @@
 #include "HighScores.h"
 #include "Pause.h"
 #include "Rain.h"
+#include "GameOver.h"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <fstream>
@@ -52,7 +53,6 @@ static TTF_Font* textFont = nullptr;
 static TTF_Font* typeFont = nullptr;
 static TTF_Font* messageFont = nullptr;
 
-//static int lives = 3;
 static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
@@ -87,13 +87,7 @@ struct PondFish {
     bool clicked;
 };
 
-// Objectives structure
-struct ObjectiveFish {
-    int type;
-    int count;
-};
-
-static ObjectiveFish objectiveFishes[4]; // can reduce number of objectives for easy
+//static ObjectiveFish objectiveFishes[4]; //can reduce number of objectives for easy
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 static Uint32 remaining = TIMER_DURATION;
@@ -505,7 +499,7 @@ void renderEasyInterface() {
         int col = i % 2;
 
         int centerX = 45 + col * 170;  // horizontal spacing
-        int centerY = 95 + row * 80;   // vertical spacing
+        int centerY = 95 + row * 60;// vertical spacing
 
         SDL_Rect fishRect = {centerX, centerY, 60, 60};
         SDL_RenderCopy(interfaceRenderer, fishTextures[objectiveFishes[i].type], NULL, &fishRect);
@@ -606,7 +600,7 @@ void renderEasyObjective() {
         int row = i / 2;
 
         int centerX = 250 + col * 300;  // 250, 550
-        int centerY = 180 + row * 100;  // 180, 280
+        int centerY = 180 + row * 100; 
 
         SDL_Rect fishRect = {centerX - 60, centerY - 30, 60, 60};
         SDL_RenderCopy(EasyobjectiveRenderer, objectiveTextures[i], NULL, &fishRect);
