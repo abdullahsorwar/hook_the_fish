@@ -59,13 +59,13 @@ struct PondFish {
     int baseX, baseY;
     bool clicked;
 };
-
+/*
 struct ObjectiveFish {
     int type;
     int count;
-};
+};*/
 
-static ObjectiveFish objectiveFishes[5];
+//static ObjectiveFish objectiveFishes[5];
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 static std::vector<int> availableTypes(10);
@@ -293,11 +293,17 @@ void handleMediumFishClick(int x, int y) {
                 for (int j = 0; j < 5 && !fishes[i].clicked; j++) {
                     if (fishes[i].type == objectiveFishes[j].type) {
                         fishScore += 2;  // Increment score for objective fish
-                        if (targetScore >= 0) {
+                        if (targetScore > 0) {
                             targetScore--;  // Decrease target score
                         }
-                        if(objectiveFishes[i].count>=0){
+                        else{
+                            targetScore = 0;
+                        }
+                        if(objectiveFishes[i].count>0){
                             objectiveFishes[j].count--;  // Decrease the objective fish count
+                        }
+                        else{
+                            targetScore = 0;
                         }
                         fishes[i].clicked = true;
                         break;
@@ -306,8 +312,14 @@ void handleMediumFishClick(int x, int y) {
 
                 // If it's not an objective fish, it's a regular fish
                 if (!fishes[i].clicked) {
-                    if(fishScore>=0){
+                    if(fishScore>0){
                         fishScore--;
+                    }
+                    else if(fishScore==0){
+                        continue;
+                    }
+                    else if(fishScore>0 && targetScore==0){
+                        fishScore++;
                     }
                     fishes[i].clicked = true;
                 }
@@ -658,6 +670,7 @@ void destroyMediumInterface() {
     lives = 3;
     remaining_time = 120000;
     totalPaused = 0;
+    targetScore = 0;
     timerRunning = false;
     timerStarted = false;
     timerStartTime = 0;
