@@ -163,8 +163,8 @@ void loadHardFishAssets()
 
     for (int i = 0; i < 4; ++i)
     {
-        std::string filename = "bmp/ripple" + std::to_string(i) + ".bmp";
-        SDL_Surface *rippleSurf = SDL_LoadBMP(filename.c_str());
+        std::string filename = "png/ripple" + std::to_string(i) + ".png";
+        SDL_Surface *rippleSurf = IMG_Load(filename.c_str());
         rippleTextures[i] = SDL_CreateTextureFromSurface(interfaceRenderer, rippleSurf);
         SDL_FreeSurface(rippleSurf);
     }
@@ -342,7 +342,7 @@ void renderHardFishAndRipples()
             int frame = fishes[i].rippleFrame / 3;
             if (frame < 4)
             {
-                SDL_Rect rippleRect = {fishes[i].baseX + 20, fishes[i].baseY + 10, 80, 80};
+                SDL_Rect rippleRect = {fishes[i].baseX, fishes[i].baseY, 40, 40};
                 SDL_RenderCopy(interfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
             }
         }
