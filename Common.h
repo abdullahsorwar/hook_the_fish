@@ -34,6 +34,16 @@ struct ObjectiveFish {
     int count;
 };
 
+struct FloatingText
+{
+    std::string text;
+    SDL_Color color;
+    SDL_Point position;
+    Uint32 startTime;
+    int duration = 1000;
+};
+
+void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count);
 void drawPondBackground(SDL_Renderer* renderer, int width, int height);
 void drawParallelogram(SDL_Renderer* renderer, Button& btn, bool hovered);
 void renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);
@@ -98,5 +108,6 @@ extern bool gameoverOpen;
 extern int fishScore;
 extern int targetScore;
 extern ObjectiveFish objectiveFishes[];
+extern std::vector<FloatingText> floatingTexts;
 
 #endif

@@ -70,20 +70,20 @@ struct PondFish
     bool clicked;
 };
 
-struct FloatingText
+/*struct FloatingText
 {
     std::string text;
     SDL_Color color;
     SDL_Point position;
     Uint32 startTime;
     int duration = 1000;
-};
+};*/
 
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 static Uint32 remaining = 120000;
 static std::vector<int> availableTypes(10);
-static std::vector<FloatingText> floatingTexts;
+//static std::vector<FloatingText> floatingTexts;
 
 std::string getFormattedTime()
 {
@@ -349,7 +349,7 @@ void renderHardFishAndRipples()
     }
 }
 
-void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
+/*void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
 {
     FloatingText text;
 
@@ -388,7 +388,7 @@ void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
     // So leave default for now
     text.startTime = init_time;
     floatingTexts.push_back(text);
-}
+}*/
 
 void handleHardFishClick(int x, int y)
 {
