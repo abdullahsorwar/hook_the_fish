@@ -44,6 +44,7 @@ struct FloatingText
 };
 
 void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count);
+void renderFaded();
 void drawPondBackground(SDL_Renderer* renderer, int width, int height);
 void drawParallelogram(SDL_Renderer* renderer, Button& btn, bool hovered);
 void renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);

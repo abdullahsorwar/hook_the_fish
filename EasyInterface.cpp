@@ -327,6 +327,10 @@ void handleEasyFishClick(int x, int y)
                 {
                     fishScore+=10;
                     fishes[i].clicked = true;
+                    renderFadedText(1, SDL_GetTicks(), -1, -1);
+                    floatingTexts.back().position = {
+                        fishes[i].rect.x + fishes[i].rect.w / 2,
+                        fishes[i].rect.y - 20};
                     if (soundOn) Mix_PlayChannel(-1, bonuscatch, 0);
                     break;
                 }
@@ -338,6 +342,10 @@ void handleEasyFishClick(int x, int y)
                         {
                             fishScore++;
                             targetScore--;
+                            renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
+                            floatingTexts.back().position = {
+                                fishes[i].rect.x + fishes[i].rect.w / 2,
+                                fishes[i].rect.y - 20};
                             objectiveFishes[j].count--;
                             fishes[i].clicked = true;
                             if (soundOn) Mix_PlayChannel(-1, rightfish, 0);
@@ -556,6 +564,8 @@ void renderEasyInterface() {
         }
     }
 
+    renderFaded();
+
     if (gamewinOpen && targetScore == 0) {
         EasyrenderGameWin();
     }
@@ -721,6 +731,20 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
         }
         SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
     }
+
+    if (e.type == SDL_KEYDOWN && e.window.windowID == SDL_GetWindowID(interfaceWindow))
+        {
+            if (e.key.keysym.sym == SDLK_ESCAPE && !isPaused)
+            {
+                initPauseMenu();
+                pauseStartTime = SDL_GetTicks();
+                isPaused = true;
+            }
+            else if (e.key.keysym.sym == SDLK_ESCAPE && isPaused)
+            {
+               SDL_RaiseWindow(pauseWindow);
+            }
+        }
 
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(EasyobjectiveWindow)) {
         SDL_Rect backBtnRect = {300, 380, 200, 60};

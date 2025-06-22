@@ -67,6 +67,52 @@ void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
     floatingTexts.push_back(text);
 }
 
+void renderFaded()
+{
+    TTF_Font* textFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 32);
+
+    Uint32 now = SDL_GetTicks();
+    for (int i = 0; i < floatingTexts.size();)
+    {
+        FloatingText &text = floatingTexts[i];
+        float progress = (now - text.startTime) / (float)text.duration;
+
+        if (progress >= 1.0f)
+        {
+            // Remove expired text
+            floatingTexts.erase(floatingTexts.begin() + i);
+            continue;
+        }
+        Uint8 alpha = (Uint8)(255 * (1.0f - progress));
+
+        SDL_Color renderColor = text.color;
+        renderColor.a = alpha;
+
+        int offsetY = (int)(-30.0f * progress);
+        int textX = text.position.x;
+        int textY = text.position.y + offsetY;
+
+        // Render centered
+        SDL_Surface *surf = TTF_RenderText_Blended(textFont, text.text.c_str(), renderColor);
+        SDL_Texture *tex = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+        SDL_Rect dst = {
+            textX - surf->w / 2,
+            textY - surf->h / 2,
+            surf->w,
+            surf->h};
+        SDL_FreeSurface(surf);
+        SDL_SetTextureAlphaMod(tex, alpha);
+        SDL_RenderCopy(interfaceRenderer, tex, NULL, &dst);
+        SDL_DestroyTexture(tex);
+
+        ++i;
+    }
+    if (textFont)
+    {
+        TTF_CloseFont(textFont);
+    }
+}
+
 void loadTextures(SDL_Renderer* renderer) {
     SDL_Surface* surf;
 

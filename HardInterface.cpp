@@ -704,8 +704,10 @@ void renderHardInterface()
             SDL_DestroyTexture(texture);
         }
     }
+
+    renderFaded();
     
-    Uint32 now = SDL_GetTicks();
+    /*Uint32 now = SDL_GetTicks();
     for (int i = 0; i < floatingTexts.size();)
     {
         FloatingText &text = floatingTexts[i];
@@ -740,7 +742,7 @@ void renderHardInterface()
         SDL_DestroyTexture(tex);
 
         ++i;
-    }
+    }*/
     if (gameoverOpen)
     {
         renderGameOver();
