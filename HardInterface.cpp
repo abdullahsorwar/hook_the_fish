@@ -24,10 +24,8 @@ static SDL_Rect pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250};
 static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 
-//SDL_Window *interfaceWindow = nullptr;
 SDL_Window *objectiveWindow = nullptr;
 SDL_Window *gamewinWindow = nullptr;
-//SDL_Renderer *interfaceRenderer = nullptr;
 static SDL_Renderer *objectiveRenderer = nullptr;
 static SDL_Renderer *gamewinRenderer = nullptr;
 
@@ -62,36 +60,16 @@ struct PondFish
     float rotation;
     bool goingUp;
     bool active;
-    /*bool rippleActive;
-    int rippleFrame;*/
     int direction;
     int type;
     int baseX, baseY;
     bool clicked;
-
-    bool rippleUpActive = false;
-    int rippleUpFrame = 0;
-    int rippleUpX = 0, rippleUpY = 0;
-
-    bool rippleDownActive = false;
-    int rippleDownFrame = 0;
-    int rippleDownX = 0, rippleDownY = 0;
 };
-
-/*struct FloatingText
-{
-    std::string text;
-    SDL_Color color;
-    SDL_Point position;
-    Uint32 startTime;
-    int duration = 1000;
-};*/
 
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 static Uint32 remaining = 120000;
 static std::vector<int> availableTypes(10);
-//static std::vector<FloatingText> floatingTexts;
 
 std::string getFormattedTime()
 {
@@ -168,14 +146,6 @@ void loadHardFishAssets()
     surf = IMG_Load("png/heart.png");
     heartTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
-
-    for (int i = 0; i < 4; ++i)
-    {
-        std::string filename = "png/ripple" + std::to_string(i) + ".png";
-        SDL_Surface *rippleSurf = IMG_Load(filename.c_str());
-        rippleTextures[i] = SDL_CreateTextureFromSurface(interfaceRenderer, rippleSurf);
-        SDL_FreeSurface(rippleSurf);
-    }
 }
 
 void loadObjectiveAssets(int type, int index)
@@ -247,8 +217,6 @@ void spawnHardFish()
             fishes[i].t = 0;
             fishes[i].goingUp = true;
             fishes[i].active = true;
-            /*fishes[i].rippleActive = false;
-            fishes[i].rippleFrame = 0;*/
             fishes[i].direction = direction;
             fishes[i].type = type;
             fishes[i].clicked = false;
@@ -269,8 +237,6 @@ void spawnHardFish()
             fishes[i].t = 0;
             fishes[i].goingUp = true;
             fishes[i].active = true;
-            /*fishes[i].rippleActive = false;
-            fishes[i].rippleFrame = 0;*/
             fishes[i].direction = direction;
             fishes[i].type = type;
             fishes[i].clicked = false;
@@ -291,48 +257,12 @@ void spawnHardFish()
             fishes[i].t = 0;
             fishes[i].goingUp = true;
             fishes[i].active = true;
-            /*fishes[i].rippleActive = false;
-            fishes[i].rippleFrame = 0;*/
             fishes[i].direction = direction;
             fishes[i].type = type;
             fishes[i].clicked = false;
         }
     }
 }
-
-/*void updateHardFishMotion()
-{
-    for (int i = 0; i < MAX_FISH; ++i)
-    {
-        if (!fishes[i].active)
-            continue;
-
-        float angle = fishes[i].t;
-        float radius = fishes[i].arcHeight;
-
-        float x = fishes[i].baseX + fishes[i].direction * radius * cos(angle);
-        float y = fishes[i].baseY - radius * sin(angle);
-
-        fishes[i].rect = {static_cast<int>(x), static_cast<int>(y), 80, 80};
-        fishes[i].t += 0.075f;
-
-        if (fishes[i].t >= PI)
-        {
-            fishes[i].active = false;
-            fishes[i].rippleActive = true;
-            fishes[i].rippleFrame = 0;
-        }
-
-        if (fishes[i].rippleActive)
-        {
-            fishes[i].rippleFrame++;
-            if (fishes[i].rippleFrame > 5)
-            {
-                fishes[i].rippleActive = false;
-            }
-        }
-    }
-}*/
 
 void updateHardFishMotion()
 {
@@ -341,7 +271,6 @@ void updateHardFishMotion()
         if (!fishes[i].active)
             continue;
 
-        // Calculate position first (used for ripple placement too)
         float angle = fishes[i].t;
         float radius = fishes[i].arcHeight;
 
@@ -349,47 +278,16 @@ void updateHardFishMotion()
         float y = fishes[i].baseY - radius * sin(angle);
 
         fishes[i].rect = {static_cast<int>(x), static_cast<int>(y), 80, 80};
-
-        // --- Popping Up Ripple ---
-        if (fishes[i].t == 0.0f)
-        {
-            fishes[i].rippleUpActive = true;
-            fishes[i].rippleUpFrame = 0;
-            fishes[i].rippleUpX = fishes[i].rect.x + 20;  // Center it
-            fishes[i].rippleUpY = fishes[i].rect.y + 20;
-        }
-
         fishes[i].t += 0.075f;
 
-        // --- Going Down Ripple ---
         if (fishes[i].t >= PI)
         {
             fishes[i].active = false;
-
-            fishes[i].rippleDownActive = true;
-            fishes[i].rippleDownFrame = 0;
-            fishes[i].rippleDownX = fishes[i].rect.x + 20;
-            fishes[i].rippleDownY = fishes[i].rect.y + 20;
-        }
-
-        // --- Animate ripple frames ---
-        if (fishes[i].rippleUpActive)
-        {
-            fishes[i].rippleUpFrame++;
-            if (fishes[i].rippleUpFrame > 11)
-                fishes[i].rippleUpActive = false;
-        }
-
-        if (fishes[i].rippleDownActive)
-        {
-            fishes[i].rippleDownFrame++;
-            if (fishes[i].rippleDownFrame > 11)
-                fishes[i].rippleDownActive = false;
         }
     }
 }
 
-/*void renderHardFishAndRipples()
+void renderHardFishAndRipples()
 {
     for (int i = 0; i < MAX_FISH; ++i)
     {
@@ -399,93 +297,8 @@ void updateHardFishMotion()
             SDL_RenderCopyEx(interfaceRenderer, fishTextures[fishes[i].type], NULL, &fishes[i].rect, 0, NULL, flip);
             SDL_RenderCopyEx(interfaceRenderer, fishTextures[fishes[i].type], NULL, &fishes[i].rect, fishes[i].rotation, NULL, flip);
         }
-
-        if (fishes[i].rippleActive)
-        {
-            int frame = fishes[i].rippleFrame / 3;
-            if (frame < 4)
-            {
-                SDL_Rect rippleRect = {fishes[i].baseX, fishes[i].baseY, 40, 40};
-                SDL_RenderCopy(interfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
-            }
-        }
-    }
-}*/
-
-void renderHardFishAndRipples()
-{
-    for (int i = 0; i < MAX_FISH; ++i)
-    {
-        if (fishes[i].active)
-        {
-            SDL_RendererFlip flip = (fishes[i].direction == -1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-            SDL_RenderCopyEx(interfaceRenderer, fishTextures[fishes[i].type], NULL, &fishes[i].rect, fishes[i].rotation, NULL, flip);
-        }
-
-        // Upward Ripple
-        if (fishes[i].rippleUpActive)
-        {
-            int frame = fishes[i].rippleUpFrame / 3;
-            if (frame < 4)
-            {
-                SDL_Rect rippleRect = {fishes[i].rippleUpX, fishes[i].rippleUpY, 40, 40};
-                SDL_RenderCopy(interfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
-            }
-        }
-
-        // Downward Ripple
-        if (fishes[i].rippleDownActive)
-        {
-            int frame = fishes[i].rippleDownFrame / 3;
-            if (frame < 4)
-            {
-                SDL_Rect rippleRect = {fishes[i].rippleDownX, fishes[i].rippleDownY, 40, 40};
-                SDL_RenderCopy(interfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
-            }
-        }
     }
 }
-
-/*void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
-{
-    FloatingText text;
-
-    if (type == 0)
-    {
-        text.text = "X";
-        text.color = {255, 0, 0, 255};
-    }
-    else if (type == 1)
-    {
-        text.text = "+10";
-        text.color = {0, 255, 0, 255};
-    }
-    else if (type == obj_type && obj_count > 0)
-    {
-        text.text = "+1";
-        text.color = {0, 255, 0, 255};
-    }
-    else if (type == obj_type && obj_count == 0)
-    {
-        text.text = "-1";
-        text.color = {255, 0, 0, 255};
-    }
-    else if (obj_type == -1 && obj_count == -1 && targetScore == 0)
-    {
-        text.text = "+1";
-        text.color = {0, 255, 0, 255};
-    }
-    else
-    {
-        text.text = "-1";
-        text.color = {255, 0, 0, 255};   
-    }
-
-    // Position will be set to fish position when called
-    // So leave default for now
-    text.startTime = init_time;
-    floatingTexts.push_back(text);
-}*/
 
 void handleHardFishClick(int x, int y)
 {
@@ -804,42 +617,6 @@ void renderHardInterface()
 
     renderFaded();
     
-    /*Uint32 now = SDL_GetTicks();
-    for (int i = 0; i < floatingTexts.size();)
-    {
-        FloatingText &text = floatingTexts[i];
-        float progress = (now - text.startTime) / (float)text.duration;
-
-        if (progress >= 1.0f)
-        {
-            // Remove expired text
-            floatingTexts.erase(floatingTexts.begin() + i);
-            continue;
-        }
-        Uint8 alpha = (Uint8)(255 * (1.0f - progress));
-
-        SDL_Color renderColor = text.color;
-        renderColor.a = alpha;
-
-        int offsetY = (int)(-30.0f * progress);
-        int textX = text.position.x;
-        int textY = text.position.y + offsetY;
-
-        // Render centered
-        SDL_Surface *surf = TTF_RenderText_Blended(textFont, text.text.c_str(), renderColor);
-        SDL_Texture *tex = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
-        SDL_Rect dst = {
-            textX - surf->w / 2,
-            textY - surf->h / 2,
-            surf->w,
-            surf->h};
-        SDL_FreeSurface(surf);
-        SDL_SetTextureAlphaMod(tex, alpha);
-        SDL_RenderCopy(interfaceRenderer, tex, NULL, &dst);
-        SDL_DestroyTexture(tex);
-
-        ++i;
-    }*/
     if (gameoverOpen)
     {
         renderGameOver();
@@ -989,11 +766,6 @@ void handleHardInterfaceLogics()
             initGameOver();
             gameoverOpen = true;
         }
-        /*if (targetScore != 0)
-        {
-            destroyHardInterface();
-            timerRunning = false;
-        }*/
     }
 }
 
