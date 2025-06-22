@@ -3,6 +3,7 @@
 #include "HighScores.h"
 #include "Pause.h"
 #include "Rain.h"
+#include "GameOver.h"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <fstream>
@@ -52,7 +53,6 @@ static TTF_Font* textFont = nullptr;
 static TTF_Font* typeFont = nullptr;
 static TTF_Font* messageFont = nullptr;
 
-//static int lives = 3;
 static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
@@ -87,13 +87,7 @@ struct PondFish {
     bool clicked;
 };
 
-// Objectives structure
-struct ObjectiveFish {
-    int type;
-    int count;
-};
-
-static ObjectiveFish objectiveFishes[4]; // can reduce number of objectives for easy
+//static ObjectiveFish objectiveFishes[4]; //can reduce number of objectives for easy
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 //static Uint32 remaining = TIMER_DURATION;
@@ -333,6 +327,10 @@ void handleEasyFishClick(int x, int y)
                 {
                     fishScore+=10;
                     fishes[i].clicked = true;
+                    renderFadedText(1, SDL_GetTicks(), -1, -1);
+                    floatingTexts.back().position = {
+                        fishes[i].rect.x + fishes[i].rect.w / 2,
+                        fishes[i].rect.y - 20};
                     if (soundOn) Mix_PlayChannel(-1, bonuscatch, 0);
                     break;
                 }
@@ -344,6 +342,10 @@ void handleEasyFishClick(int x, int y)
                         {
                             fishScore++;
                             targetScore--;
+                            renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
+                            floatingTexts.back().position = {
+                                fishes[i].rect.x + fishes[i].rect.w / 2,
+                                fishes[i].rect.y - 20};
                             objectiveFishes[j].count--;
                             fishes[i].clicked = true;
                             if (soundOn) Mix_PlayChannel(-1, rightfish, 0);
@@ -505,7 +507,7 @@ void renderEasyInterface() {
         int col = i % 2;
 
         int centerX = 45 + col * 170;  // horizontal spacing
-        int centerY = 95 + row * 80;   // vertical spacing
+        int centerY = 95 + row * 60;// vertical spacing
 
         SDL_Rect fishRect = {centerX, centerY, 60, 60};
         SDL_RenderCopy(interfaceRenderer, fishTextures[objectiveFishes[i].type], NULL, &fishRect);
@@ -562,6 +564,8 @@ void renderEasyInterface() {
         }
     }
 
+    renderFaded();
+
     if (gamewinOpen && targetScore == 0) {
         EasyrenderGameWin();
     }
@@ -606,7 +610,7 @@ void renderEasyObjective() {
         int row = i / 2;
 
         int centerX = 250 + col * 300;  // 250, 550
-        int centerY = 180 + row * 100;  // 180, 280
+        int centerY = 180 + row * 100; 
 
         SDL_Rect fishRect = {centerX - 60, centerY - 30, 60, 60};
         SDL_RenderCopy(EasyobjectiveRenderer, objectiveTextures[i], NULL, &fishRect);
@@ -727,6 +731,20 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
         }
         SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
     }
+
+    if (e.type == SDL_KEYDOWN && e.window.windowID == SDL_GetWindowID(interfaceWindow))
+        {
+            if (e.key.keysym.sym == SDLK_ESCAPE && !isPaused)
+            {
+                initPauseMenu();
+                pauseStartTime = SDL_GetTicks();
+                isPaused = true;
+            }
+            else if (e.key.keysym.sym == SDLK_ESCAPE && isPaused)
+            {
+               SDL_RaiseWindow(pauseWindow);
+            }
+        }
 
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(EasyobjectiveWindow)) {
         SDL_Rect backBtnRect = {300, 380, 200, 60};

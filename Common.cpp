@@ -16,8 +16,13 @@ SDL_Window *interfaceWindow = nullptr;
 SDL_Renderer *interfaceRenderer = nullptr;
 int fishScore = 0;
 int targetScore = 0;
+<<<<<<< HEAD
 Uint32 remaining = 120000;
 int lives = 3;
+=======
+ObjectiveFish objectiveFishes[6] = {0};
+std::vector<FloatingText> floatingTexts;
+>>>>>>> a6edc9cd0c4868064d04de9d013de2e5df1f61b1
 
 Mix_Music* intro = nullptr;
 Mix_Music* game_music = nullptr;
@@ -25,6 +30,93 @@ Mix_Chunk* rightfish = nullptr;
 Mix_Chunk* wrongfish = nullptr;
 Mix_Chunk* bonuscatch = nullptr;
 Mix_Chunk* crocodile = nullptr;
+
+void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
+{
+    FloatingText text;
+
+    if (type == 0)
+    {
+        text.text = "X";
+        text.color = {255, 0, 0, 255};
+    }
+    else if (type == 1)
+    {
+        text.text = "+10";
+        text.color = {0, 255, 0, 255};
+    }
+    else if (type == obj_type && obj_count > 0)
+    {
+        text.text = "+1";
+        text.color = {0, 255, 0, 255};
+    }
+    else if (type == obj_type && obj_count == 0)
+    {
+        text.text = "-1";
+        text.color = {255, 0, 0, 255};
+    }
+    else if (obj_type == -1 && obj_count == -1 && targetScore == 0)
+    {
+        text.text = "+1";
+        text.color = {0, 255, 0, 255};
+    }
+    else
+    {
+        text.text = "-1";
+        text.color = {255, 0, 0, 255};   
+    }
+
+    // Position will be set to fish position when called
+    // So leave default for now
+    text.startTime = init_time;
+    floatingTexts.push_back(text);
+}
+
+void renderFaded()
+{
+    TTF_Font* textFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 32);
+
+    Uint32 now = SDL_GetTicks();
+    for (int i = 0; i < floatingTexts.size();)
+    {
+        FloatingText &text = floatingTexts[i];
+        float progress = (now - text.startTime) / (float)text.duration;
+
+        if (progress >= 1.0f)
+        {
+            // Remove expired text
+            floatingTexts.erase(floatingTexts.begin() + i);
+            continue;
+        }
+        Uint8 alpha = (Uint8)(255 * (1.0f - progress));
+
+        SDL_Color renderColor = text.color;
+        renderColor.a = alpha;
+
+        int offsetY = (int)(-30.0f * progress);
+        int textX = text.position.x;
+        int textY = text.position.y + offsetY;
+
+        // Render centered
+        SDL_Surface *surf = TTF_RenderText_Blended(textFont, text.text.c_str(), renderColor);
+        SDL_Texture *tex = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+        SDL_Rect dst = {
+            textX - surf->w / 2,
+            textY - surf->h / 2,
+            surf->w,
+            surf->h};
+        SDL_FreeSurface(surf);
+        SDL_SetTextureAlphaMod(tex, alpha);
+        SDL_RenderCopy(interfaceRenderer, tex, NULL, &dst);
+        SDL_DestroyTexture(tex);
+
+        ++i;
+    }
+    if (textFont)
+    {
+        TTF_CloseFont(textFont);
+    }
+}
 
 void loadTextures(SDL_Renderer* renderer) {
     SDL_Surface* surf;
