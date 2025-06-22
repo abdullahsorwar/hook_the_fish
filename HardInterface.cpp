@@ -62,12 +62,20 @@ struct PondFish
     float rotation;
     bool goingUp;
     bool active;
-    bool rippleActive;
-    int rippleFrame;
+    /*bool rippleActive;
+    int rippleFrame;*/
     int direction;
     int type;
     int baseX, baseY;
     bool clicked;
+
+    bool rippleUpActive = false;
+    int rippleUpFrame = 0;
+    int rippleUpX = 0, rippleUpY = 0;
+
+    bool rippleDownActive = false;
+    int rippleDownFrame = 0;
+    int rippleDownX = 0, rippleDownY = 0;
 };
 
 /*struct FloatingText
@@ -239,8 +247,8 @@ void spawnHardFish()
             fishes[i].t = 0;
             fishes[i].goingUp = true;
             fishes[i].active = true;
-            fishes[i].rippleActive = false;
-            fishes[i].rippleFrame = 0;
+            /*fishes[i].rippleActive = false;
+            fishes[i].rippleFrame = 0;*/
             fishes[i].direction = direction;
             fishes[i].type = type;
             fishes[i].clicked = false;
@@ -261,8 +269,8 @@ void spawnHardFish()
             fishes[i].t = 0;
             fishes[i].goingUp = true;
             fishes[i].active = true;
-            fishes[i].rippleActive = false;
-            fishes[i].rippleFrame = 0;
+            /*fishes[i].rippleActive = false;
+            fishes[i].rippleFrame = 0;*/
             fishes[i].direction = direction;
             fishes[i].type = type;
             fishes[i].clicked = false;
@@ -283,8 +291,8 @@ void spawnHardFish()
             fishes[i].t = 0;
             fishes[i].goingUp = true;
             fishes[i].active = true;
-            fishes[i].rippleActive = false;
-            fishes[i].rippleFrame = 0;
+            /*fishes[i].rippleActive = false;
+            fishes[i].rippleFrame = 0;*/
             fishes[i].direction = direction;
             fishes[i].type = type;
             fishes[i].clicked = false;
@@ -292,7 +300,7 @@ void spawnHardFish()
     }
 }
 
-void updateHardFishMotion()
+/*void updateHardFishMotion()
 {
     for (int i = 0; i < MAX_FISH; ++i)
     {
@@ -318,15 +326,70 @@ void updateHardFishMotion()
         if (fishes[i].rippleActive)
         {
             fishes[i].rippleFrame++;
-            if (fishes[i].rippleFrame > 10)
+            if (fishes[i].rippleFrame > 5)
             {
                 fishes[i].rippleActive = false;
             }
         }
     }
+}*/
+
+void updateHardFishMotion()
+{
+    for (int i = 0; i < MAX_FISH; ++i)
+    {
+        if (!fishes[i].active)
+            continue;
+
+        // Calculate position first (used for ripple placement too)
+        float angle = fishes[i].t;
+        float radius = fishes[i].arcHeight;
+
+        float x = fishes[i].baseX + fishes[i].direction * radius * cos(angle);
+        float y = fishes[i].baseY - radius * sin(angle);
+
+        fishes[i].rect = {static_cast<int>(x), static_cast<int>(y), 80, 80};
+
+        // --- Popping Up Ripple ---
+        if (fishes[i].t == 0.0f)
+        {
+            fishes[i].rippleUpActive = true;
+            fishes[i].rippleUpFrame = 0;
+            fishes[i].rippleUpX = fishes[i].rect.x + 20;  // Center it
+            fishes[i].rippleUpY = fishes[i].rect.y + 20;
+        }
+
+        fishes[i].t += 0.075f;
+
+        // --- Going Down Ripple ---
+        if (fishes[i].t >= PI)
+        {
+            fishes[i].active = false;
+
+            fishes[i].rippleDownActive = true;
+            fishes[i].rippleDownFrame = 0;
+            fishes[i].rippleDownX = fishes[i].rect.x + 20;
+            fishes[i].rippleDownY = fishes[i].rect.y + 20;
+        }
+
+        // --- Animate ripple frames ---
+        if (fishes[i].rippleUpActive)
+        {
+            fishes[i].rippleUpFrame++;
+            if (fishes[i].rippleUpFrame > 11)
+                fishes[i].rippleUpActive = false;
+        }
+
+        if (fishes[i].rippleDownActive)
+        {
+            fishes[i].rippleDownFrame++;
+            if (fishes[i].rippleDownFrame > 11)
+                fishes[i].rippleDownActive = false;
+        }
+    }
 }
 
-void renderHardFishAndRipples()
+/*void renderHardFishAndRipples()
 {
     for (int i = 0; i < MAX_FISH; ++i)
     {
@@ -343,6 +406,40 @@ void renderHardFishAndRipples()
             if (frame < 4)
             {
                 SDL_Rect rippleRect = {fishes[i].baseX, fishes[i].baseY, 40, 40};
+                SDL_RenderCopy(interfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
+            }
+        }
+    }
+}*/
+
+void renderHardFishAndRipples()
+{
+    for (int i = 0; i < MAX_FISH; ++i)
+    {
+        if (fishes[i].active)
+        {
+            SDL_RendererFlip flip = (fishes[i].direction == -1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+            SDL_RenderCopyEx(interfaceRenderer, fishTextures[fishes[i].type], NULL, &fishes[i].rect, fishes[i].rotation, NULL, flip);
+        }
+
+        // Upward Ripple
+        if (fishes[i].rippleUpActive)
+        {
+            int frame = fishes[i].rippleUpFrame / 3;
+            if (frame < 4)
+            {
+                SDL_Rect rippleRect = {fishes[i].rippleUpX, fishes[i].rippleUpY, 40, 40};
+                SDL_RenderCopy(interfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
+            }
+        }
+
+        // Downward Ripple
+        if (fishes[i].rippleDownActive)
+        {
+            int frame = fishes[i].rippleDownFrame / 3;
+            if (frame < 4)
+            {
+                SDL_Rect rippleRect = {fishes[i].rippleDownX, fishes[i].rippleDownY, 40, 40};
                 SDL_RenderCopy(interfaceRenderer, rippleTextures[frame], NULL, &rippleRect);
             }
         }
