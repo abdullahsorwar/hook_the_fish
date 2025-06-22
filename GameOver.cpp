@@ -68,18 +68,22 @@ void renderGameOver()
     if (!gameOverRenderer)
         return;
     std::cout << "point crossed\n";
-    SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
-    SDL_RenderClear(gameOverRenderer);
-
-    SDL_Color white = {255, 255, 255, 255};
-    SDL_Color black = {0, 0, 0, 255};
     std::string text = "files/" + interface + ".txt";
     if (targetScore == 0 && checkHighScore(text.c_str(), fishScore))
     {
         renderHighScoreTrue();
     }
+    else if (remaining==0 && targetScore!=0) {
+
+        renderTimeOver();
+ 
+    }
     else
     {
+        SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
+        SDL_RenderClear(gameOverRenderer);
+        SDL_Color white = {255, 255, 255, 255};
+        SDL_Color black = {0, 0, 0, 255};
         renderText(gameOverRenderer, titleFont, "Oops!", white, 400, 80);
 
         int mx, my;
@@ -101,6 +105,8 @@ void renderGameOver()
 void renderHighScoreTrue()
 {
     verdict = true;
+    SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
+    SDL_RenderClear(gameOverRenderer);
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
     renderText(gameOverRenderer, smalltitleFont, "Congratulations!", white, 400, 80);
@@ -183,6 +189,46 @@ void renderHighScoreTrue()
     }
 }
 
+void renderTimeOver()
+{
+    SDL_Color white = {255, 255, 255, 255};
+    SDL_Color black = {0, 0, 0, 255};
+    renderText(gameOverRenderer, smalltitleFont, "Oops!", white, 400, 80);
+
+    int mx, my;
+    SDL_GetMouseState(&mx, &my);
+    SDL_Point mousePoint = {mx, my};
+
+    conf = "Exit";
+    Button confirmBtn = {confirmButton, conf, false};
+    confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
+
+    drawParallelogram(gameOverRenderer, confirmBtn, confirmBtn.hovered);
+    renderText(gameOverRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
+
+    renderText(gameOverRenderer, textFont, "Your Time Is Over!", white, 400, 150);
+}
+
+void handleTimeOverEvents(SDL_Event &e, bool &timeoverOpen)
+{
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
+    {
+        if (timeoverOpen)
+        {
+            int mx = e.button.x;
+            int my = e.button.y;
+            SDL_Rect backBtnRect = {300, 380, 200, 60};
+            SDL_GetMouseState(&mx, &my);
+            SDL_Point mousePoint = {mx, my};
+            if (SDL_PointInRect(&mousePoint, &backBtnRect) && conf == "Exit")
+            {
+                destroyGameOver();
+            }
+        }
+    }
+}
+
+
 void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
 {
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
@@ -203,6 +249,12 @@ void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
     if (gameoverOpen && verdict)
     {
         handleHighScoreTrue(e, gameoverOpen);
+    }
+    else if (remaining==0 && targetScore!=0)
+    {
+
+    handleTimeOverEvents(e, gameoverOpen); 
+
     }
 }
 

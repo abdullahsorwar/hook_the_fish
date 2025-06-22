@@ -96,7 +96,7 @@ struct ObjectiveFish {
 static ObjectiveFish objectiveFishes[4]; // can reduce number of objectives for easy
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
-static Uint32 remaining = TIMER_DURATION;
+//static Uint32 remaining = TIMER_DURATION;
 static std::vector<int> availableTypes(10); // could be adjusted (fewer types for easier mode)
 
 std::string EasygetFormattedTime() {

@@ -82,7 +82,6 @@ struct FloatingText
 ObjectiveFish objectiveFishes[6] = {0};
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
-static Uint32 remaining = 120000;
 static std::vector<int> availableTypes(10);
 static std::vector<FloatingText> floatingTexts;
 

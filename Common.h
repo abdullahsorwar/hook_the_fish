@@ -92,5 +92,7 @@ extern bool objectiveClose;
 extern bool gameoverOpen;
 extern int fishScore;
 extern int targetScore;
+extern Uint32 remaining;
+extern int lives;
 
 #endif
