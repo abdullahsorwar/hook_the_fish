@@ -22,6 +22,9 @@
 static SDL_Rect pond = {0, 250, 1280, 470};
 static SDL_Rect pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250};
+static SDL_Rect sun = {0, 80, 1280, 170};
+static SDL_Rect cloud = {600, -30, 240, 160};
+static SDL_Rect crocodileRect = {10, 350, 300, 150};
 static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 
 SDL_Window *objectiveWindow = nullptr;
@@ -32,7 +35,10 @@ static SDL_Renderer *gamewinRenderer = nullptr;
 static SDL_Texture *pondTexture = nullptr;
 static SDL_Texture *pond2Texture = nullptr;
 static SDL_Texture *mountainTexture = nullptr;
+static SDL_Texture *sunTexture = nullptr;
+static SDL_Texture *cloudyTexture = nullptr;
 static SDL_Texture *heartTexture = nullptr;
+static SDL_Texture *crocodileTexture = nullptr;
 static SDL_Texture *fishTextures[12] = {nullptr};
 static SDL_Texture *objectiveTextures[6] = {nullptr};
 static SDL_Texture *rippleTextures[4] = {nullptr};
@@ -144,6 +150,10 @@ void loadHardFishAssets()
 
     surf = IMG_Load("png/heart.png");
     heartTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+    SDL_FreeSurface(surf);
+
+    surf = IMG_Load("png/crocodileclose.png");
+    crocodileTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 }
 
@@ -438,6 +448,10 @@ void initHardInterface()
         surf = SDL_LoadBMP("bmp/mountain.bmp");
         mountainTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_FreeSurface(surf);
+
+        surf = IMG_Load("png/sun.png");
+        sunTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+        SDL_FreeSurface(surf);
     }
     else if (!sunnyOn)
     {
@@ -451,6 +465,10 @@ void initHardInterface()
 
         surf = SDL_LoadBMP("bmp/rainymountain.bmp");
         mountainTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+        SDL_FreeSurface(surf);
+
+        surf = IMG_Load("png/cloud.png");
+        cloudyTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_FreeSurface(surf);
 
         initRain(500);
@@ -496,6 +514,9 @@ void renderHardInterface()
     SDL_RenderCopy(interfaceRenderer, pondTexture, NULL, &pond);
     SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
     SDL_RenderCopy(interfaceRenderer, mountainTexture, NULL, &mountain);
+    SDL_RenderCopy(interfaceRenderer, crocodileTexture, NULL, &crocodileRect);
+    if (sunnyOn) SDL_RenderCopy(interfaceRenderer, sunTexture, NULL, &sun);
+    else SDL_RenderCopy(interfaceRenderer, cloudyTexture, NULL, &cloud);
 
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
@@ -786,6 +807,16 @@ void destroyHardInterface()
     {
         SDL_DestroyTexture(mountainTexture);
         mountainTexture = nullptr;
+    }
+    if (sunTexture)
+    {
+        SDL_DestroyTexture(sunTexture);
+        sunTexture = nullptr;
+    }
+    if (cloudyTexture)
+    {
+        SDL_DestroyTexture(cloudyTexture);
+        cloudyTexture = nullptr;
     }
     for (int i = 0; i < 12; ++i)
     {
