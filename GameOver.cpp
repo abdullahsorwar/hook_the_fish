@@ -209,7 +209,7 @@ void renderTimeOver()
     renderText(gameOverRenderer, textFont, "Your Time Is Over!", white, 400, 150);
 }
 
-void handleTimeOverEvents(SDL_Event &e, bool &timeoverOpen)
+void handleTimeOverEvents(e, timeoverOpen)
 {
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
     {
@@ -247,7 +247,7 @@ void renderLifeOver()
 
     renderText(gameOverRenderer, textFont, "None of Your Lives Remain Anymore", white, 400, 150);
 }
-void handleTimeOverEvents(SDL_Event &e, bool &timeoverOpen)
+//void handleTimeOverEvents(SDL_Event &e, bool &timeoverOpen)
 {
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
     {

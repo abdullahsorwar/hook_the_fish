@@ -44,7 +44,7 @@ static TTF_Font *textFont = nullptr;
 static TTF_Font *typeFont = nullptr;
 static TTF_Font *messageFont = nullptr;
 
-static int lives = 3;
+int lives = 3;
 static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;

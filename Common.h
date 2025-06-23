@@ -108,12 +108,9 @@ extern bool objectiveClose;
 extern bool gameoverOpen;
 extern int fishScore;
 extern int targetScore;
-<<<<<<< HEAD
 extern Uint32 remaining;
-extern int lives;
-=======
+//extern int lives;
 extern ObjectiveFish objectiveFishes[];
 extern std::vector<FloatingText> floatingTexts;
->>>>>>> a6edc9cd0c4868064d04de9d013de2e5df1f61b1
 
 #endif
