@@ -23,4 +23,5 @@ void handleHighScoreTrue(SDL_Event& e, bool& gameoverOpen);
 void destroyGameOver();
 bool isGameOverOpen();
 
+
 #endif

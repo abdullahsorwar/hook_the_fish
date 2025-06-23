@@ -228,6 +228,43 @@ void handleTimeOverEvents(SDL_Event &e, bool &timeoverOpen)
     }
 }
 
+void renderLifeOver()
+{
+    SDL_Color white = {255, 255, 255, 255};
+    SDL_Color black = {0, 0, 0, 255};
+    renderText(gameOverRenderer, smalltitleFont, "Oops!", white, 400, 80);
+
+    int mx, my;
+    SDL_GetMouseState(&mx, &my);
+    SDL_Point mousePoint = {mx, my};
+
+    conf = "Exit";
+    Button confirmBtn = {confirmButton, conf, false};
+    confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
+
+    drawParallelogram(gameOverRenderer, confirmBtn, confirmBtn.hovered);
+    renderText(gameOverRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
+
+    renderText(gameOverRenderer, textFont, "None of Your Lives Remain Anymore", white, 400, 150);
+}
+void handleTimeOverEvents(SDL_Event &e, bool &timeoverOpen)
+{
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
+    {
+        if (isLifeLost)
+        {
+            int mx = e.button.x;
+            int my = e.button.y;
+            SDL_Rect backBtnRect = {300, 380, 200, 60};
+            SDL_GetMouseState(&mx, &my);
+            SDL_Point mousePoint = {mx, my};
+            if (SDL_PointInRect(&mousePoint, &backBtnRect) && conf == "Exit")
+            {
+                destroyGameOver();
+            }
+        }
+    }
+}
 
 void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
 {
@@ -256,7 +293,13 @@ void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
     handleTimeOverEvents(e, gameoverOpen); 
 
     }
-}
+    else if (lives==0 && targetScore!=0)
+    {
+
+        handleTimeOverEvents(e, gameoverOpen);
+
+    }
+}   
 
 void handleHighScoreTrue(SDL_Event &e, bool &gameoverOpen)
 {

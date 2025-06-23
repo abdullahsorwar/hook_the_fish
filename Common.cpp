@@ -16,13 +16,9 @@ SDL_Window *interfaceWindow = nullptr;
 SDL_Renderer *interfaceRenderer = nullptr;
 int fishScore = 0;
 int targetScore = 0;
-<<<<<<< HEAD
 Uint32 remaining = 120000;
 int lives = 3;
-=======
-ObjectiveFish objectiveFishes[6] = {0};
-std::vector<FloatingText> floatingTexts;
->>>>>>> a6edc9cd0c4868064d04de9d013de2e5df1f61b1
+
 
 Mix_Music* intro = nullptr;
 Mix_Music* game_music = nullptr;
