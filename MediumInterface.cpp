@@ -35,8 +35,6 @@ static SDL_Texture* heartTexture = nullptr;
 static std::vector<SDL_Texture*> fishTextures, objectiveTextures, rippleTextures;
 
 static TTF_Font* titleFont = nullptr, *buttonFont = nullptr, *textFont = nullptr;
-
-//int lives = 3;
 uint32_t timerStartTime = 0;
 bool timerRunning = false;
 static const Uint32 TIMER_DURATION = 120000;
@@ -92,8 +90,8 @@ std::string getMediumFormattedTime() {
             SDL_Delay(16);    
         }*/
     }
-
-    int remainingTime = 120000 - elapsed;  
+    
+    int remainingTime = 120000-elapsed;
     int minutes = remainingTime / 60000;
     int seconds = (remainingTime % 60000) / 1000;
 
@@ -167,7 +165,7 @@ void spawnMediumFish() {
             int direction = (rand() % 2 == 0) ? 1 : -1;
 
             // Randomly assign type, ensuring special fish types (golden and piranha) are handled separately
-            int type = rand() % 10;  // Normal fish types (0-9)
+            int type = rand() % 5;  // Normal fish types (0-4)
             if (rand() % 100 < 10) {  // 10% chance for golden fish
                 type = 11;  // Golden fish type (last one in fishPaths)
             } else if (rand() % 100 < 20) {  // 20% chance for piranha fish
@@ -195,7 +193,7 @@ void spawnMediumFish() {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
-            int type = i - 7;  // Objective fish types (based on availableTypes, adjust logic here)
+            int type = i;  // Objective fish types (based on availableTypes, adjust logic here)
 
             fishes[i].arcHeight = rand() % 60 + 70;
             fishes[i].rect.x = fishes[i].baseX;
@@ -270,11 +268,23 @@ void handleMediumFishClick(int x, int y) {
             if (fishes[i].type == 11) {  // Golden fish type (assuming 11 represents golden fish)
                 fishScore += 15;  // Add 15 points for golden fish
                 fishes[i].clicked = true;
+                rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                floatingTexts.back().position = {
+                    fishes[i].rect.x + fishes[i].rect.w / 2,
+                    fishes[i].rect.y - 20};
             }
+
             else if (fishes[i].type == 10) {  // Piranha fish type (assuming 10 represents piranha fish)
                 lives--;  // Decrease life by 1
+                fishes[i].clicked = true;
+                rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                floatingTexts.back().position = {
+                    fishes[i].rect.x + fishes[i].rect.w / 2,
+                    fishes[i].rect.y - 20};
+
                 if (lives == 0) {
-                    isLifeLost = true;
+                    destroyMediumInterface();
+                    break;
                     //GameOverOpen = true;
                     //initGameOver();
                     /*if (GameOverOpen) {
@@ -286,24 +296,22 @@ void handleMediumFishClick(int x, int y) {
                         SDL_Delay(16);
                     }*/
                 }
-                fishes[i].clicked = true;
+                
             }
             // Handle regular and objective fishes
             else {
                 for (int j = 0; j < 5 && !fishes[i].clicked; j++) {
                     if (fishes[i].type == objectiveFishes[j].type) {
                         fishScore += 2;  // Increment score for objective fish
+                        rendermediumFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
+                        floatingTexts.back().position = {
+                            fishes[i].rect.x + fishes[i].rect.w / 2,
+                            fishes[i].rect.y - 20};
                         if (targetScore > 0) {
                             targetScore--;  // Decrease target score
                         }
-                        else{
-                            targetScore = 0;
-                        }
                         if(objectiveFishes[i].count>0){
                             objectiveFishes[j].count--;  // Decrease the objective fish count
-                        }
-                        else{
-                            targetScore = 0;
                         }
                         fishes[i].clicked = true;
                         break;
@@ -313,12 +321,20 @@ void handleMediumFishClick(int x, int y) {
                 // If it's not an objective fish, it's a regular fish
                 if (!fishes[i].clicked) {
                     if(fishScore>0){
+                        rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                        floatingTexts.back().position = {
+                            fishes[i].rect.x + fishes[i].rect.w / 2,
+                            fishes[i].rect.y - 20};
                         fishScore--;
                     }
                     else if(fishScore==0){
                         continue;
                     }
                     else if(fishScore>0 && targetScore==0){
+                        rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                        floatingTexts.back().position = {
+                            fishes[i].rect.x + fishes[i].rect.w / 2,
+                            fishes[i].rect.y - 20};
                         fishScore++;
                     }
                     fishes[i].clicked = true;
@@ -494,6 +510,7 @@ void renderMediumInterface() {
     }
 
     renderMediumFishAndRipples();
+    renderFaded();
 
     SDL_RenderPresent(interfaceRenderer);
     if (!objectiveClose) renderMediumObjective();
@@ -637,10 +654,13 @@ void destroyMediumInterface() {
     }
 
     // Free sound/music if necessary
-    if (medium_game_music) {
-        Mix_FreeMusic(medium_game_music);
-        medium_game_music = nullptr;
+    if (soundOn)
+    {
+        Mix_PauseMusic();
+        Mix_PlayMusic(intro, -1);
     }
+    else
+        Mix_PauseMusic();
 
     for (auto& tex : fishTextures) {
         if (tex) SDL_DestroyTexture(tex);

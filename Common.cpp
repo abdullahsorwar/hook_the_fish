@@ -70,6 +70,47 @@ void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
     floatingTexts.push_back(text);
 }
 
+void rendermediumFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
+{
+    FloatingText text;
+
+    if (type == 10)
+    {
+        text.text = "X";
+        text.color = {255, 0, 0, 255};
+    }
+    else if (type == 11)
+    {
+        text.text = "+15";
+        text.color = {0, 255, 0, 255};
+    }
+    else if (type == obj_type && obj_count > 0)
+    {
+        text.text = "+2";
+        text.color = {0, 255, 0, 255};
+    }
+    /*else if (type == obj_type && obj_count == 0)
+    {
+        text.text = "-1";
+        text.color = {255, 0, 0, 255};
+    }*/
+    else if (obj_type == -1 && obj_count == -1 && targetScore == 0)
+    {
+        text.text = "+1";
+        text.color = {0, 255, 0, 255};
+    }
+    else
+    {
+        text.text = "-1";
+        text.color = {255, 0, 0, 255};   
+    }
+
+    // Position will be set to fish position when called
+    // So leave default for now
+    text.startTime = init_time;
+    floatingTexts.push_back(text);
+}
+
 void renderFaded()
 {
     TTF_Font* textFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 32);
