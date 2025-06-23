@@ -111,6 +111,7 @@ extern int fishScore;
 extern int targetScore;
 extern Uint32 remaining;
 extern int lives;
+extern bool crocodiletouch;
 extern ObjectiveFish objectiveFishes[];
 extern std::vector<FloatingText> floatingTexts;
 

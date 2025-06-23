@@ -15,7 +15,7 @@ void renderCrocodileOver();
 void renderTimeOver();
 void renderHighScoreFalse();
 void handleTimeOverEvents(SDL_Event& e, bool& timeoverOpen);
-void handleCrocodileOverEvents(SDL_Event& e, bool& crocodileoverOpen);
+void handleCrocodileOverEvents(SDL_Event& e, bool& crocodiletouch);
 void handleHighScoreFalse(SDL_Event& e, bool& gameoverOpen);
 void handleLifeOverEvents(SDL_Event& e, bool& lifeoverOpen);
 void handleGameOverEvents(SDL_Event& e, bool& gameoverOpen);
