@@ -36,7 +36,7 @@ static std::vector<SDL_Texture*> fishTextures, objectiveTextures, rippleTextures
 
 static TTF_Font* titleFont = nullptr, *buttonFont = nullptr, *textFont = nullptr;
 
-int lives = 3;
+//int lives = 3;
 uint32_t timerStartTime = 0;
 bool timerRunning = false;
 static const Uint32 TIMER_DURATION = 120000;

@@ -59,7 +59,7 @@ void initGameOver()
         interface = "medium";
     else if (hardinterfaceOpen)
         interface = "hard";
-
+    gameoverOpen = true;
     SDL_StartTextInput();
 }
 
@@ -74,9 +74,11 @@ void renderGameOver()
         renderHighScoreTrue();
     }
     else if (remaining==0 && targetScore!=0) {
-
         renderTimeOver();
- 
+    }
+    else if (lives==0)
+    {
+        renderLifeOver();
     }
     else
     {
@@ -199,8 +201,7 @@ void renderTimeOver()
     SDL_GetMouseState(&mx, &my);
     SDL_Point mousePoint = {mx, my};
 
-    conf = "Exit";
-    Button confirmBtn = {confirmButton, conf, false};
+    Button confirmBtn = {confirmButton, "Exit", false};
     confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
 
     drawParallelogram(gameOverRenderer, confirmBtn, confirmBtn.hovered);
@@ -209,7 +210,7 @@ void renderTimeOver()
     renderText(gameOverRenderer, textFont, "Your Time Is Over!", white, 400, 150);
 }
 
-void handleTimeOverEvents(e, timeoverOpen)
+void handleTimeOverEvents(SDL_Event& e, bool& timeoverOpen)
 {
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
     {
@@ -220,7 +221,7 @@ void handleTimeOverEvents(e, timeoverOpen)
             SDL_Rect backBtnRect = {300, 380, 200, 60};
             SDL_GetMouseState(&mx, &my);
             SDL_Point mousePoint = {mx, my};
-            if (SDL_PointInRect(&mousePoint, &backBtnRect) && conf == "Exit")
+            if (SDL_PointInRect(&mousePoint, &backBtnRect))
             {
                 destroyGameOver();
             }
@@ -238,8 +239,7 @@ void renderLifeOver()
     SDL_GetMouseState(&mx, &my);
     SDL_Point mousePoint = {mx, my};
 
-    conf = "Exit";
-    Button confirmBtn = {confirmButton, conf, false};
+    Button confirmBtn = {confirmButton, "Exit", false};
     confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
 
     drawParallelogram(gameOverRenderer, confirmBtn, confirmBtn.hovered);
@@ -247,18 +247,19 @@ void renderLifeOver()
 
     renderText(gameOverRenderer, textFont, "None of Your Lives Remain Anymore", white, 400, 150);
 }
-//void handleTimeOverEvents(SDL_Event &e, bool &timeoverOpen)
+
+void handleLifeOverEvents(SDL_Event &e, bool &timeoverOpen)
 {
     if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
     {
-        if (isLifeLost)
+        if (lives == 0)
         {
             int mx = e.button.x;
             int my = e.button.y;
             SDL_Rect backBtnRect = {300, 380, 200, 60};
             SDL_GetMouseState(&mx, &my);
             SDL_Point mousePoint = {mx, my};
-            if (SDL_PointInRect(&mousePoint, &backBtnRect) && conf == "Exit")
+            if (SDL_PointInRect(&mousePoint, &backBtnRect))
             {
                 destroyGameOver();
             }
@@ -289,15 +290,11 @@ void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
     }
     else if (remaining==0 && targetScore!=0)
     {
-
-    handleTimeOverEvents(e, gameoverOpen); 
-
+        handleTimeOverEvents(e, gameoverOpen); 
     }
-    else if (lives==0 && targetScore!=0)
+    else if (lives==0)
     {
-
-        handleTimeOverEvents(e, gameoverOpen);
-
+        handleLifeOverEvents(e, gameoverOpen);
     }
 }   
 

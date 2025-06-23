@@ -14,6 +14,8 @@ SDL_Texture* copyright = nullptr;
 SDL_Texture* rodTexture = nullptr;
 SDL_Window *interfaceWindow = nullptr;
 SDL_Renderer *interfaceRenderer = nullptr;
+ObjectiveFish objectiveFishes[6] = {0};
+std::vector<FloatingText> floatingTexts;
 int fishScore = 0;
 int targetScore = 0;
 Uint32 remaining = 120000;

@@ -44,7 +44,7 @@ static TTF_Font *textFont = nullptr;
 static TTF_Font *typeFont = nullptr;
 static TTF_Font *messageFont = nullptr;
 
-int lives = 3;
+//int lives = 3;
 static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
@@ -316,7 +316,9 @@ void handleHardFishClick(int x, int y)
                     fishes[i].rect.x + fishes[i].rect.w / 2,
                     fishes[i].rect.y - 20};
                 if (lives == 0)
-                    destroyHardInterface();
+                {
+                    initGameOver();
+                }
                 break;
             }
             else if (fishes[i].type == 1)
@@ -613,11 +615,10 @@ void renderHardInterface()
             SDL_DestroyTexture(texture);
         }
     }
-
     renderFaded();
-    
     if (gameoverOpen)
     {
+        std::cout << "entry point\n";
         renderGameOver();
     }
     int mx, my;
@@ -760,11 +761,7 @@ void handleHardInterfaceLogics()
 
     if (remaining == 0)
     {
-        if (!gameoverOpen)
-        {
-            initGameOver();
-            gameoverOpen = true;
-        }
+        initGameOver();
     }
 }
 
