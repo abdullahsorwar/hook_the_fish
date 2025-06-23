@@ -366,6 +366,10 @@ void handleEasyFishClick(int x, int y)
                 {
                     fishScore++;
                     fishes[i].clicked = true;
+                    renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                    floatingTexts.back().position = {
+                        fishes[i].rect.x + fishes[i].rect.w / 2,
+                        fishes[i].rect.y - 20};
                     if (soundOn) Mix_PlayChannel(-1, rightfish, 0);
                     break;
                 }
@@ -373,6 +377,9 @@ void handleEasyFishClick(int x, int y)
                 {
                     //if (fishScore > 0) fishScore--;
                     fishes[i].clicked = true;
+                    floatingTexts.back().position = {
+                    fishes[i].rect.x + fishes[i].rect.w / 2,
+                    fishes[i].rect.y - 20};
                     if (soundOn) Mix_PlayChannel(-1, wrongfish, 0); // should remove it??
                     break;
                 }
@@ -765,7 +772,7 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
         }
     }
 
-    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(EasygamewinWindow)) {
+    /*if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(EasygamewinWindow)) {
         if (gamewinOpen) {
             int mx = e.button.x;
             int my = e.button.y;
@@ -795,7 +802,7 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
                 destroyEasyInterface();
             }
         }
-    }
+    }*/
 
     if (gamewinOpen) {
         if (e.type == SDL_TEXTINPUT && inputActive) {
@@ -899,6 +906,7 @@ void destroyEasyInterface() {
     pauseStartTime = 0;
     totalPaused = 0;
     isPaused = false;
+    timerRunning = false;
     congratulationsFlag = false;
 
     for (int i = 0; i < MAX_FISH; ++i) {
