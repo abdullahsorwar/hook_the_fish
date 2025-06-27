@@ -24,7 +24,8 @@ static SDL_Rect pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250};
 static SDL_Rect sun = {0, 80, 1280, 170};
 static SDL_Rect cloud = {600, -30, 240, 160};
-static SDL_Rect crocodileRect = {10, 350, 300, 150};
+static SDL_Rect crocodileRect = {1200, 550, 200, 100};
+static SDL_Rect boat = {50, 350, 300, 300};
 static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 
 SDL_Window *objectiveWindow = nullptr;
@@ -38,7 +39,9 @@ static SDL_Texture *mountainTexture = nullptr;
 static SDL_Texture *sunTexture = nullptr;
 static SDL_Texture *cloudyTexture = nullptr;
 static SDL_Texture *heartTexture = nullptr;
-static SDL_Texture *crocodileTexture = nullptr;
+static SDL_Texture *crocodileCloseTexture = nullptr;
+static SDL_Texture *crocodileOpenTexture = nullptr;
+static SDL_Texture *boatTexture = nullptr;
 static SDL_Texture *fishTextures[12] = {nullptr};
 static SDL_Texture *objectiveTextures[6] = {nullptr};
 static SDL_Texture *rippleTextures[4] = {nullptr};
@@ -55,6 +58,8 @@ static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
 static bool congratulationsFlag = false;
+static bool golden = false;
+static Uint32 init = 0;
 static const Uint32 TIMER_DURATION = 120000;
 bool hardinterfaceOpen = false;
 
@@ -153,7 +158,15 @@ void loadHardFishAssets()
     SDL_FreeSurface(surf);
 
     surf = IMG_Load("png/crocodileclose.png");
-    crocodileTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+    crocodileCloseTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+    SDL_FreeSurface(surf);
+
+    surf = IMG_Load("png/crocodileopen.png");
+    crocodileOpenTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+    SDL_FreeSurface(surf);
+
+    surf = IMG_Load("png/fisherman.png");
+    boatTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 }
 
@@ -335,6 +348,8 @@ void handleHardFishClick(int x, int y)
             {
                 fishScore += 10;
                 fishes[i].clicked = true;
+                golden = true;
+                init = SDL_GetTicks();
                 renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
                 floatingTexts.back().position = {
                     fishes[i].rect.x + fishes[i].rect.w / 2,
@@ -514,9 +529,12 @@ void renderHardInterface()
     SDL_RenderCopy(interfaceRenderer, pondTexture, NULL, &pond);
     SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
     SDL_RenderCopy(interfaceRenderer, mountainTexture, NULL, &mountain);
-    SDL_RenderCopy(interfaceRenderer, crocodileTexture, NULL, &crocodileRect);
-    if (sunnyOn) SDL_RenderCopy(interfaceRenderer, sunTexture, NULL, &sun);
-    else SDL_RenderCopy(interfaceRenderer, cloudyTexture, NULL, &cloud);
+    std::cout << (remaining % 60000) / 1000 << "\n";
+    if (((remaining % 60000) / 1000) % 2 == 0) SDL_RenderCopy(interfaceRenderer, crocodileCloseTexture, NULL, &crocodileRect);
+    else SDL_RenderCopy(interfaceRenderer, crocodileOpenTexture, NULL, &crocodileRect);
+    SDL_RenderCopy(interfaceRenderer, boatTexture, NULL, &boat);
+    /*if (sunnyOn) SDL_RenderCopy(interfaceRenderer, sunTexture, NULL, &sun);
+    else SDL_RenderCopy(interfaceRenderer, cloudyTexture, NULL, &cloud);*/
 
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
@@ -774,6 +792,15 @@ void handleHardInterfaceLogics()
 
     pond.x += 1;
     pond2.x += 1;
+
+    if (golden)
+    {
+        Uint32 t = SDL_GetTicks();
+        if (t - init < 1000) crocodileRect.x += 5;
+        else golden = false;
+        
+    }
+    else if (((remaining % 60000) / 500) % 2 == 0) crocodileRect.x -=1;
 
     if (pond.x > 1279)
         pond.x = -1279;
