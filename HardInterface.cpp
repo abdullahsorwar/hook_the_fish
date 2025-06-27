@@ -433,7 +433,7 @@ void initHardInterface()
 
     game_music = Mix_LoadMUS("music/game_music.mp3");
     bonuscatch = Mix_LoadWAV("music/bonuscatch.wav");
-    crocodile = Mix_LoadWAV("music/crocodile.wav");
+    crocodile = Mix_LoadWAV("music/crocodile2.wav");
     rightfish = Mix_LoadWAV("music/rightfish.wav");
     wrongfish = Mix_LoadWAV("music/wrongfish.wav");
 
@@ -529,12 +529,9 @@ void renderHardInterface()
     SDL_RenderCopy(interfaceRenderer, pondTexture, NULL, &pond);
     SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
     SDL_RenderCopy(interfaceRenderer, mountainTexture, NULL, &mountain);
-    std::cout << (remaining % 60000) / 1000 << "\n";
-    if (((remaining % 60000) / 1000) % 2 == 0) SDL_RenderCopy(interfaceRenderer, crocodileCloseTexture, NULL, &crocodileRect);
+    if (((remaining % 60000) / 1000) % 2 == 0 && !crocodiletouch) SDL_RenderCopy(interfaceRenderer, crocodileCloseTexture, NULL, &crocodileRect);
     else SDL_RenderCopy(interfaceRenderer, crocodileOpenTexture, NULL, &crocodileRect);
     SDL_RenderCopy(interfaceRenderer, boatTexture, NULL, &boat);
-    /*if (sunnyOn) SDL_RenderCopy(interfaceRenderer, sunTexture, NULL, &sun);
-    else SDL_RenderCopy(interfaceRenderer, cloudyTexture, NULL, &cloud);*/
 
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
@@ -657,7 +654,6 @@ void renderHardInterface()
     renderFaded();
     if (gameoverOpen)
     {
-        std::cout << "entry point\n";
         renderGameOver();
     }
     int mx, my;
@@ -793,15 +789,22 @@ void handleHardInterfaceLogics()
     pond.x += 1;
     pond2.x += 1;
 
-    if (golden)
+    if (golden && !crocodiletouch)
     {
         Uint32 t = SDL_GetTicks();
         if (t - init < 1000) crocodileRect.x += 5;
-        else golden = false;
-        
+        else golden = false;   
     }
-    else if (((remaining % 60000) / 500) % 2 == 0) crocodileRect.x -=1;
-
+    else if (((remaining % 60000) / 500) % 2 == 0 && !crocodiletouch)
+    {
+        crocodileRect.x -=1;
+        if (crocodileRect.x <= 330)
+        {
+            crocodiletouch = true;
+            Mix_PlayChannel(-1, crocodile, 0);
+        }
+    }
+    if (crocodiletouch) initGameOver();
     if (pond.x > 1279)
         pond.x = -1279;
     if (pond2.x > 1279)
@@ -886,6 +889,8 @@ void destroyHardInterface()
     totalPaused = 0;
     isPaused = false;
     congratulationsFlag = false;
+    init = 0;
+    golden = false;
     for (int i = 0; i < MAX_FISH; ++i)
     {
         fishes[i] = PondFish();

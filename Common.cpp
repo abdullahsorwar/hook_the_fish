@@ -20,6 +20,7 @@ int fishScore = 0;
 int targetScore = 0;
 Uint32 remaining = 120000;
 int lives = 3;
+bool crocodiletouch = false;
 
 
 Mix_Music* intro = nullptr;
