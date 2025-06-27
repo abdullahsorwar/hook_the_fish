@@ -16,8 +16,16 @@ SDL2 (Simple Directmedia Layer 2)
 <h3>Added Menus</h3>
 <ol>
   <li>New Game<ul>
-    <li>Easy</li>
-    <li>Medium</li>
+    <li>Easy<ul>
+      <li>Loading Screen</li>
+      <li>Interface</li>
+      <li>Pause Menu</li>
+    </ul></li>
+    <li>Medium<ul>
+      <li>Loading Screen</li>
+      <li>Interface</li>
+      <li>Pause Menu</li>
+    </ul></li>
     <li>Hard<ul>
       <li>Loading Screen</li>
       <li>Interface</li>
@@ -43,5 +51,5 @@ SDL2 (Simple Directmedia Layer 2)
   <li>Fish Interaction with Mouse</li>
   <li>Auto Sound/Weather Update Save</li>
   <li>High Scores Save</li>
-  <li>Initially Playable Hard Mode, some fixes will be done</li>
+  <li>Playable Modes: Easy, Medium, Hard (Beta)</li>
 </ul>

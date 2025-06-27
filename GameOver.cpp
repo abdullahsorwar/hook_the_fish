@@ -365,7 +365,8 @@ void handleHighScoreTrue(SDL_Event &e, bool &gameoverOpen)
         if (mx >= confirmButton.x && mx <= confirmButton.x + confirmButton.w &&
             my >= confirmButton.y && my <= confirmButton.y + confirmButton.h && conf == "Confirm")
         {
-            finalText = checkAndAddHighScore("files/hard.txt", userInput, fishScore);
+            std::string text = "files/" + interface + ".txt";
+            finalText = checkAndAddHighScore(text, userInput, fishScore);
         }
         SDL_Rect backBtnRect = {300, 380, 200, 60};
         SDL_GetMouseState(&mx, &my);
