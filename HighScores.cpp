@@ -82,7 +82,7 @@ std::string checkAndAddHighScore(const std::string& filename, const std::string&
 
     loadScoresFromFile(filename);
 
-    if (newScore > loadedScores.back().second) {
+    if (loadedScores.size() < 5 || newScore > loadedScores.back().second) {
         std::cout << "You made a High Score!\n";
         loadedScores.emplace_back(playerName, newScore);
 
@@ -227,6 +227,11 @@ void renderHighscores() {
             renderText(subRenderer, buttonFont, to_string(score), white, 700, y);
 
             y += 40;
+        }
+
+        if (loadedScores.size() == 0)
+        {
+            renderText(subRenderer, textFont, "No highscores found!", white, 400, 200);
         }
 
         Button closeSubBtn = {closeBtnRect, "Close", false};
