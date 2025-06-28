@@ -327,7 +327,7 @@ void handleEasyFishClick(int x, int y)
                 {
                     fishScore+=10;
                     fishes[i].clicked = true;
-                    renderFadedText(1, SDL_GetTicks(), -1, -1);
+                    renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
                     floatingTexts.back().position = {
                         fishes[i].rect.x + fishes[i].rect.w / 2,
                         fishes[i].rect.y - 20};
@@ -356,6 +356,10 @@ void handleEasyFishClick(int x, int y)
                         {
                             //if (fishScore > 0) fishScore--;
                             fishes[i].clicked = true;
+                            /*renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
+                            floatingTexts.back().position = {
+                                fishes[i].rect.x + fishes[i].rect.w / 2,
+                                fishes[i].rect.y - 20};*/
                             if (soundOn) Mix_PlayChannel(-1, wrongfish, 0);
                             break;
                         }
@@ -576,6 +580,10 @@ void renderEasyInterface() {
     if (gamewinOpen && targetScore == 0) {
         EasyrenderGameWin();
     }
+    if (gameoverOpen)
+    {
+        renderGameOver();
+    }
 
     int mx, my;
     SDL_GetMouseState(&mx, &my);
@@ -735,6 +743,9 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
             initPauseMenu();
             pauseStartTime = SDL_GetTicks();
             isPaused = true;
+        }else if (SDL_PointInRect(&mp, &pauseBtn) && isPaused && objectiveClose)
+        {
+            SDL_RaiseWindow(pauseWindow);
         }
         SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
     }
@@ -820,6 +831,10 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
         renderPauseMenu();
         handlePauseMenuEvents(e, isPaused);
     }
+    if (gameoverOpen)
+    {
+        handleGameOverEvents(e, gameoverOpen);
+    }
 }
 
 
@@ -838,6 +853,11 @@ void handleEasyInterfaceLogics() {
 
     if (remaining == 0)
     {
+        initGameOver();
+    }
+    
+    /*if (remaining == 0)
+    {
         if (targetScore == 0 && !gamewinOpen) {
             EasyinitgameWin();
             gamewinOpen = true;
@@ -846,7 +866,7 @@ void handleEasyInterfaceLogics() {
             destroyEasyInterface();
             timerRunning = false;
         }
-    }
+    }*/
 }
 
 void EasyendGame(int targetScore)

@@ -33,38 +33,64 @@ Mix_Chunk* crocodile = nullptr;
 void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
 {
     FloatingText text;
-
-    if (type == 0)
-    {
-        text.text = "X";
-        text.color = {255, 0, 0, 255};
-    }
-    else if (type == 1)
-    {
-        text.text = "+10";
-        text.color = {0, 255, 0, 255};
-    }
-    else if (type == obj_type && obj_count > 0)
-    {
-        text.text = "+1";
-        text.color = {0, 255, 0, 255};
-    }
-    else if (type == obj_type && obj_count == 0)
-    {
-        text.text = "-1";
-        text.color = {255, 0, 0, 255};
-    }
-    else if (obj_type == -1 && obj_count == -1 && targetScore == 0)
-    {
-        text.text = "+1";
-        text.color = {0, 255, 0, 255};
-    }
-    else
-    {
-        text.text = "-1";
-        text.color = {255, 0, 0, 255};   
-    }
-
+    if(hardinterfaceOpen){
+            if (type == 0)
+            {
+                text.text = "X";
+                text.color = {255, 0, 0, 255};
+            }
+            else if (type == 1)
+            {
+                text.text = "+10";
+                text.color = {0, 255, 0, 255};
+            }
+            else if (type == obj_type && obj_count > 0)
+            {
+                text.text = "+1";
+                text.color = {0, 255, 0, 255};
+            }
+            else if (type == obj_type && obj_count == 0)
+            {
+                text.text = "-1";
+                text.color = {255, 0, 0, 255};
+            }
+            else if (obj_type == -1 && obj_count == -1 && targetScore == 0)
+            {
+                text.text = "+1";
+                text.color = {0, 255, 0, 255};
+            }
+            else
+            {
+                text.text = "-1";
+                text.color = {255, 0, 0, 255};   
+            }
+        }else if(EasyinterfaceOpen){
+            if (type == 0)
+            {
+                text.text = "+10";
+                text.color = {0, 255, 0, 255};
+            }
+            else if (type == obj_type && obj_count > 0)
+            {
+                text.text = "+1";
+                text.color = {0, 255, 0, 255};
+            }
+            else if (type == obj_type && obj_count == 0)
+            {
+                text.text = "X";
+                text.color = {255, 0, 0, 255};
+            }
+            else if (obj_type == -1 && obj_count == -1 && targetScore == 0)
+            {
+                text.text = "+1";
+                text.color = {0, 255, 0, 255};
+            }
+            else
+            {
+                text.text = "X";
+                text.color = {255, 0, 0, 255};   
+            }
+        }        
     // Position will be set to fish position when called
     // So leave default for now
     text.startTime = init_time;
