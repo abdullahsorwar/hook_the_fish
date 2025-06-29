@@ -67,7 +67,6 @@ void renderGameOver()
 {
     if (!gameOverRenderer)
         return;
-    std::cout << "point crossed\n";
     std::string text = "files/" + interface + ".txt";
     if (targetScore == 0 && checkHighScore(text.c_str(), fishScore))
     {
