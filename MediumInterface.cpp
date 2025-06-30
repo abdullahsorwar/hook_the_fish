@@ -35,6 +35,8 @@ static SDL_Texture* heartTexture = nullptr;
 static std::vector<SDL_Texture*> fishTextures, objectiveTextures, rippleTextures;
 
 static TTF_Font* titleFont = nullptr, *buttonFont = nullptr, *textFont = nullptr;
+
+//int lives = 3;
 uint32_t timerStartTime = 0;
 bool timerRunning = false;
 static const Uint32 TIMER_DURATION = 120000;
@@ -77,10 +79,10 @@ std::string getMediumFormattedTime() {
     // If the elapsed time exceeds 120 seconds (02:00), stop the timer
     if (elapsed >= 120000) {
         elapsed = 120000;  
-        timerRunning = false;  
-        //gameOverOpen = true;  
+        timerRunning = false; 
+        gameoverOpen = true;  
         // Add game over logic here if needed
-        //initGameOver();  
+        initGameOver();  
         /*if(GameOverOpen){
             SDL_Event e;
             while(SDL_PollEvent(&e)){
@@ -283,10 +285,9 @@ void handleMediumFishClick(int x, int y) {
                     fishes[i].rect.y - 20};
 
                 if (lives == 0) {
-                    destroyMediumInterface();
+                    gameoverOpen = true;                    
+                    initGameOver();
                     break;
-                    //GameOverOpen = true;
-                    //initGameOver();
                     /*if (GameOverOpen) {
                         SDL_Event e;
                         while (SDL_PollEvent(&e)) {
@@ -302,15 +303,24 @@ void handleMediumFishClick(int x, int y) {
             else {
                 for (int j = 0; j < 5 && !fishes[i].clicked; j++) {
                     if (fishes[i].type == objectiveFishes[j].type) {
-                        fishScore += 2;  // Increment score for objective fish
-                        rendermediumFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
-                        floatingTexts.back().position = {
-                            fishes[i].rect.x + fishes[i].rect.w / 2,
-                            fishes[i].rect.y - 20};
-                        if (targetScore > 0) {
+                        if(objectiveFishes[j].count>0){
+                            fishScore += 2;  // Increment score for objective fish
+                            rendermediumFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
+                            floatingTexts.back().position = {
+                                fishes[i].rect.x + fishes[i].rect.w / 2,
+                                fishes[i].rect.y - 20};
+                        }
+                        else{
+                            fishScore++;
+                            rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                            floatingTexts.back().position = {
+                                fishes[i].rect.x + fishes[i].rect.w / 2,
+                                fishes[i].rect.y - 20};
+                        }
+                        if (targetScore > 0 && objectiveFishes[j].count>0) {
                             targetScore--;  // Decrease target score
                         }
-                        if(objectiveFishes[i].count>0){
+                        if(objectiveFishes[j].count>0){
                             objectiveFishes[j].count--;  // Decrease the objective fish count
                         }
                         fishes[i].clicked = true;
@@ -321,7 +331,7 @@ void handleMediumFishClick(int x, int y) {
                 // If it's not an objective fish, it's a regular fish
                 if (!fishes[i].clicked) {
                     if(fishScore>0){
-                        rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                        rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -2);
                         floatingTexts.back().position = {
                             fishes[i].rect.x + fishes[i].rect.w / 2,
                             fishes[i].rect.y - 20};
@@ -511,6 +521,10 @@ void renderMediumInterface() {
 
     renderMediumFishAndRipples();
     renderFaded();
+    if (gameoverOpen)
+    {
+        renderGameOver();
+    }
 
     SDL_RenderPresent(interfaceRenderer);
     if (!objectiveClose) renderMediumObjective();
@@ -590,6 +604,10 @@ void handleMediumInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
     {
         renderPauseMenu();
         handlePauseMenuEvents(e, isPaused);
+    }
+    if (gameoverOpen)
+    {
+        handleGameOverEvents(e, gameoverOpen);
     }
 }
 
