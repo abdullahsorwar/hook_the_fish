@@ -340,6 +340,7 @@ void handleMediumFishClick(int x, int y) {
                         fishScore--;
                     }
                     else if(fishScore==0){
+                        rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -2);
                         continue;
                     }
                     else if(fishScore>0 && targetScore==0){
@@ -365,6 +366,9 @@ void initMediumInterface(){
     if (interfaceWindow != nullptr) return;
 
     game_music = Mix_LoadMUS("music/game_music.mp3");
+    bonuscatch = Mix_LoadWAV("music/bonuscatch.wav");
+    rightfish = Mix_LoadWAV("music/rightfish.wav");
+    wrongfish = Mix_LoadWAV("music/wrongfish.wav");
 
     interfaceWindow = SDL_CreateWindow("Medium Mode", 
         SDL_WINDOWPOS_CENTERED, 
