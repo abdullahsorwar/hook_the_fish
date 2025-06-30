@@ -79,10 +79,8 @@ std::string getMediumFormattedTime() {
     // If the elapsed time exceeds 120 seconds (02:00), stop the timer
     if (elapsed >= 120000) {
         elapsed = 120000;  
-        timerRunning = false; 
-        gameoverOpen = true;  
-        // Add game over logic here if needed
-        initGameOver();  
+        timerRunning = false;
+        // Add game over logic here if needed 
         /*if(GameOverOpen){
             SDL_Event e;
             while(SDL_PollEvent(&e)){
@@ -93,11 +91,15 @@ std::string getMediumFormattedTime() {
         }*/
     }
     
-    int remainingTime = 120000-elapsed;
-    int minutes = remainingTime / 60000;
-    int seconds = (remainingTime % 60000) / 1000;
+    remaining = 120000-elapsed;
+    if(remaining==0){
+        gameoverOpen = true;
+        initGameOver();
+    }
+    int minutes = remaining / 60000;
+    int seconds = (remaining % 60000) / 1000;
 
-    char timeStr[6];
+    char timeStr[9];
     snprintf(timeStr, sizeof(timeStr), "%02d:%02d", minutes, seconds);
 
     return std::string(timeStr);
@@ -521,6 +523,7 @@ void renderMediumInterface() {
 
     renderMediumFishAndRipples();
     renderFaded();
+
     if (gameoverOpen)
     {
         renderGameOver();
@@ -706,6 +709,7 @@ void destroyMediumInterface() {
     // Reset game state
     fishScore = 0;
     lives = 3;
+    remaining = 120000;
     remaining_time = 120000;
     totalPaused = 0;
     targetScore = 0;

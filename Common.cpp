@@ -121,7 +121,7 @@ void rendermediumFadedText(int type, Uint32 init_time, int obj_type, int obj_cou
         text.text = "-1";
         text.color = {255, 0, 0, 255};
     }*/
-    else if (obj_type == -1 && obj_count == -1 && targetScore == 0)
+    else if (obj_type == -1 && obj_count == -1)
     {
         text.text = "+1";
         text.color = {0, 255, 0, 255};
