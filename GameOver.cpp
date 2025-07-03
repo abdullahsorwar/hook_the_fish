@@ -68,22 +68,32 @@ void renderGameOver()
     if (!gameOverRenderer)
         return;
     std::string text = "files/" + interface + ".txt";
+    std::cout << "DEBUG targetScore: " << targetScore << "\n";
+    std::cout << "DEBUG fishScore: " << fishScore << "\n";
+    std::cout << "DEBUG file: " << text << "\n";
+    bool high = checkHighScore(text, fishScore);
+    std::cout << "DEBUG highscore check result: " << high << "\n";
     if (targetScore == 0 && checkHighScore(text.c_str(), fishScore))
     {
+        std::cout<<"1"<<endl;
         renderHighScoreTrue();
     }
     else if (remaining==0 && targetScore!=0) {
+        std::cout<<"2"<<endl;
         renderTimeOver();
     }
     else if (lives==0)
     {
+        std::cout<<"3"<<endl;
         renderLifeOver();
     }
     else if (crocodiletouch)
     {
+        std::cout<<"4"<<endl;
         renderCrocodileOver();
     }
-    else
+
+    /*else
     {
         SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
         SDL_RenderClear(gameOverRenderer);
@@ -103,7 +113,7 @@ void renderGameOver()
         renderText(gameOverRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
 
         renderText(gameOverRenderer, textFont, "Under Construction!", white, 400, 150);
-    }
+    }*/
     SDL_RenderPresent(gameOverRenderer);
 }
 

@@ -30,11 +30,11 @@ static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 // Windows and renderers
 //SDL_Window* interfaceWindow = nullptr;
 SDL_Window* EasyobjectiveWindow = nullptr;
-SDL_Window* EasygamewinWindow = nullptr;
+//SDL_Window* EasygamewinWindow = nullptr;
 
 //SDL_Renderer* interfaceRenderer = nullptr;
 static SDL_Renderer* EasyobjectiveRenderer = nullptr;
-static SDL_Renderer* gamewinRenderer = nullptr;
+//static SDL_Renderer* gamewinRenderer = nullptr;
 
 // Textures (use different fish/backgrounds in Easy mode)
 static SDL_Texture* pondTexture = nullptr;
@@ -62,13 +62,13 @@ static const Uint32 TIMER_DURATION = 120000; // 2 minutes
 bool EasyinterfaceOpen = false;  // renamed for Easy
 
 // Game Win Input State
-std::string EasyuserInput = "";
+/*std::string EasyuserInput = "";
 std::string EasyfinalText = "";
 std::string Easyconf = "";
 
 static bool inputActive = false;
-static bool showCursor = true;
-static bool gamewinOpen = false;
+static bool showCursor = true;*/
+//static bool gamewinOpen = false;
 
 static Uint32 lastCursorToggle = 0;
 
@@ -253,7 +253,7 @@ void spawnEasyFish() {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
-            int type = rand() % 11; //11
+            int type =availableTypes[5+rand()%5]; //11
             
             fishes[i].arcHeight = rand() % 60 + 70;
             fishes[i].rect.x = fishes[i].baseX;
@@ -333,6 +333,29 @@ void handleEasyFishClick(int x, int y)
                         fishes[i].rect.y - 20};
                     if (soundOn) Mix_PlayChannel(-1, bonuscatch, 0);
                     break;
+                }else if (targetScore == 0)
+                {
+                    fishScore++;
+                    fishes[i].clicked = true;
+                    renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                    floatingTexts.back().position = {
+                        fishes[i].rect.x + fishes[i].rect.w / 2,
+                        fishes[i].rect.y - 20};
+                    if (soundOn) Mix_PlayChannel(-1, rightfish, 0);
+                    break;
+                }
+                
+                else if(i>4)
+                {
+                    printf("type %d\n",fishes[i].type);
+                    //if (fishScore > 0) fishScore--;
+                    fishes[i].clicked = true;
+                    renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
+                    floatingTexts.back().position = {
+                    fishes[i].rect.x + fishes[i].rect.w / 2,
+                    fishes[i].rect.y - 20};
+                    if (soundOn) Mix_PlayChannel(-1, wrongfish, 0); // should remove it??
+                    break;
                 }
                 else if (targetScore > 0)
                 {
@@ -340,6 +363,7 @@ void handleEasyFishClick(int x, int y)
                     {
                         if (fishes[i].type == objectiveFishes[j].type && objectiveFishes[j].count > 0)
                         {
+                            printf("Click on %d, {%d %d %d %d}\n",fishes[i].type,availableTypes[0],availableTypes[1],availableTypes[2],availableTypes[3]);
                             fishScore++;
                             targetScore--;
                             renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
@@ -366,27 +390,7 @@ void handleEasyFishClick(int x, int y)
                     }
                     if (fishes[i].clicked) break;
                 }
-                else if (targetScore == 0)
-                {
-                    fishScore++;
-                    fishes[i].clicked = true;
-                    renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
-                    floatingTexts.back().position = {
-                        fishes[i].rect.x + fishes[i].rect.w / 2,
-                        fishes[i].rect.y - 20};
-                    if (soundOn) Mix_PlayChannel(-1, rightfish, 0);
-                    break;
-                }
-                else
-                {
-                    //if (fishScore > 0) fishScore--;
-                    fishes[i].clicked = true;
-                    floatingTexts.back().position = {
-                    fishes[i].rect.x + fishes[i].rect.w / 2,
-                    fishes[i].rect.y - 20};
-                    if (soundOn) Mix_PlayChannel(-1, wrongfish, 0); // should remove it??
-                    break;
-                }
+                
             }
     }
 }
@@ -577,9 +581,6 @@ void renderEasyInterface() {
 
     renderFaded();
 
-    if (gamewinOpen && targetScore == 0) {
-        EasyrenderGameWin();
-    }
     if (gameoverOpen)
     {
         renderGameOver();
@@ -637,7 +638,7 @@ void renderEasyObjective() {
     SDL_RenderPresent(EasyobjectiveRenderer);
 }
 
-void EasyinitgameWin()
+/*void EasyinitgameWin()
 {
     if (EasygamewinWindow != nullptr) return;
 
@@ -646,9 +647,9 @@ void EasyinitgameWin()
 
     typeFont = TTF_OpenFont ("fonts/Arial.ttf", 24);
     SDL_StartTextInput();
-}
+}*/
 
-void EasyrenderGameWin() {
+/*void EasyrenderGameWin() {
     if (!gamewinRenderer) return;
 
     SDL_SetRenderDrawColor(gamewinRenderer, 20, 20, 40, 255);
@@ -728,7 +729,7 @@ void EasyrenderGameWin() {
     }
 
     SDL_RenderPresent(gamewinRenderer);
-}
+}*/
 
 void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
     if (!interfaceWindow) return;
@@ -815,17 +816,7 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
         }
     }*/
 
-    if (gamewinOpen) {
-        if (e.type == SDL_TEXTINPUT && inputActive) {
-            EasyuserInput += e.text.text;
-        }
-
-        if (e.type == SDL_KEYDOWN && inputActive) {
-            if (e.key.keysym.sym == SDLK_BACKSPACE && !EasyuserInput.empty()) {
-                EasyuserInput.pop_back();
-            }
-        }
-    }
+    
 
     if (isPaused) {
         renderPauseMenu();
@@ -853,6 +844,7 @@ void handleEasyInterfaceLogics() {
 
     if (remaining == 0)
     {
+        gameoverOpen=true;
         initGameOver();
     }
     
@@ -869,13 +861,6 @@ void handleEasyInterfaceLogics() {
     }*/
 }
 
-void EasyendGame(int targetScore)
-{
-    if (targetScore == 0)
-    {
-        
-    }
-}
 
 void destroyEasyInterface() {
     if (pondTexture) {
@@ -933,12 +918,7 @@ void destroyEasyInterface() {
         fishes[i] = PondFish();
     }
 
-    EasyuserInput = "";
-    EasyfinalText = "";
-    Easyconf = "";
-    inputActive = false;
-    showCursor = true;
-    gamewinOpen = false;
+    //gamewinOpen = false;
     lastCursorToggle = 0;
     remaining = 120000;
 
