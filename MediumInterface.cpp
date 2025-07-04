@@ -242,7 +242,7 @@ void updateMediumFishMotion() {
         float y = fishes[i].baseY - radius * sin(angle);
 
         fishes[i].rect = {static_cast<int>(x), static_cast<int>(y), 80, 80};
-        fishes[i].t += 0.070f;
+        fishes[i].t += 0.060f;
 
         if (fishes[i].t >= PI) {
             fishes[i].active = false;
@@ -326,7 +326,9 @@ void handleMediumFishClick(int x, int y) {
                                 fishes[i].rect.x + fishes[i].rect.w / 2,
                                 fishes[i].rect.y - 20};
                             if (soundOn) Mix_PlayChannel(-1, rightfish, 0);
-                            if (targetScore == 0) congratsStartTime = SDL_GetTicks();
+                            if (targetScore == 0 && congratsStartTime == 0) {
+                                congratsStartTime = SDL_GetTicks();
+                            }
                             
                         }
                         else{
@@ -646,8 +648,11 @@ void renderMediumInterface() {
 
     renderMediumFishAndRipples();
 
-    if (targetScore == 0 &&  remaining>0 && !congratulationsFlag) {
+    if (targetScore == 0 && !congratulationsFlag) {
         Uint32 now = SDL_GetTicks();
+        if (congratsStartTime == 0) {
+            congratsStartTime = now;
+        }
         Uint32 elapsed = now - congratsStartTime;
         float progress = elapsed / 3000.0f;
 
@@ -776,7 +781,7 @@ void handleMediumInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
             timerRunning = true;
         }
     }
-
+    /*
     if (gamewinOpen) {
         if (e.type == SDL_TEXTINPUT && inputActive) {
             mediumuserInput += e.text.text;
@@ -787,7 +792,7 @@ void handleMediumInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
                 mediumuserInput.pop_back();
             }
         }
-    }
+    }*/
 
     if (isPaused)
     {
