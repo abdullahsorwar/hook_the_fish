@@ -24,8 +24,8 @@ static SDL_Rect pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250};
 static SDL_Rect sun = {0, 80, 1280, 170};
 static SDL_Rect cloud = {600, -30, 240, 160};
-static SDL_Rect crocodileRect = {1200, 550, 200, 100};
-static SDL_Rect boat = {50, 350, 300, 300};
+static SDL_Rect crocodileRect = {1300, 200, 200, 100};
+static SDL_Rect boat = {500, 100, 200, 200};
 static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 
 SDL_Window *objectiveWindow = nullptr;
@@ -798,7 +798,7 @@ void handleHardInterfaceLogics()
     else if (((remaining % 60000) / 500) % 2 == 0 && !crocodiletouch)
     {
         crocodileRect.x -=1;
-        if (crocodileRect.x <= 330)
+        if (crocodileRect.x <= 680)
         {
             crocodiletouch = true;
             Mix_PlayChannel(-1, crocodile, 0);
@@ -891,6 +891,8 @@ void destroyHardInterface()
     congratulationsFlag = false;
     init = 0;
     golden = false;
+    crocodileRect = {1300, 200, 200, 100};
+    crocodiletouch = false;
     for (int i = 0; i < MAX_FISH; ++i)
     {
         fishes[i] = PondFish();
