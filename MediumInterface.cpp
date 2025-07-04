@@ -20,6 +20,7 @@
 static SDL_Rect pond = {0, 250, 1280, 470}, pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250}, mountain2 = {-1279, 0, 1280, 250};
 static SDL_Rect inputBox = {250, 200, 300, 50};
+static SDL_Rect boat = {500, 100, 200, 200};
 static SDL_Rect confirmButton = {300, 380, 200, 60};
 
 Mix_Music* medium_game_music = nullptr;
@@ -35,6 +36,7 @@ static SDL_Texture* pondTexture = nullptr;
 static SDL_Texture* pond2Texture = nullptr;
 static SDL_Texture* mountainTexture = nullptr;
 static SDL_Texture* mountain2Texture = nullptr;
+static SDL_Texture *boatTexture = nullptr;
 static SDL_Texture* heartTexture = nullptr;
 static std::vector<SDL_Texture*> fishTextures, objectiveTextures, rippleTextures;
 
@@ -142,6 +144,10 @@ void loadMediumFishAssets(){
 
     surf = IMG_Load("png/heart.png");
     heartTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+    SDL_FreeSurface(surf);
+
+    surf = IMG_Load("png/fisherman.png");
+    boatTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
 }
@@ -575,6 +581,7 @@ void renderMediumInterface() {
     SDL_RenderCopy(interfaceRenderer, pondTexture, NULL, &pond);
     SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
     SDL_RenderCopy(interfaceRenderer, mountainTexture, NULL, &mountain);
+    SDL_RenderCopy(interfaceRenderer, boatTexture, NULL, &boat);
 
     if(sunnyOn){
         SDL_RenderCopy(interfaceRenderer, mountain2Texture, NULL, &mountain2);
