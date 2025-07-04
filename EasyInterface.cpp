@@ -380,10 +380,10 @@ void handleEasyFishClick(int x, int y)
                         {
                             //if (fishScore > 0) fishScore--;
                             fishes[i].clicked = true;
-                            /*renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
+                            renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
                             floatingTexts.back().position = {
                                 fishes[i].rect.x + fishes[i].rect.w / 2,
-                                fishes[i].rect.y - 20};*/
+                                fishes[i].rect.y - 20};
                             if (soundOn) Mix_PlayChannel(-1, wrongfish, 0);
                             break;
                         }

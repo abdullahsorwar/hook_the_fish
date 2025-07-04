@@ -75,6 +75,11 @@ void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
                 text.text = "+1";
                 text.color = {0, 255, 0, 255};
             }
+            else if (type == obj_type && obj_count == 0)
+            {
+                text.text = "X";
+                text.color = {255, 0, 0, 255};
+            }
             else if (obj_type == -1 && obj_count == -1 && targetScore == 0)
             {
                 text.text = "+1";
