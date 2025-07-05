@@ -370,7 +370,7 @@ void handleMediumFishClick(int x, int y) {
                     }
                     else if(fishScore==0){
                         rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -2);
-                        continue;
+                        if (soundOn) Mix_PlayChannel(-1, wrongfish, 0);
                     }
                     else if(fishScore>0 && targetScore==0){
                         rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
