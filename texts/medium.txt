@@ -1,3 +1,7 @@
 Medium mode:
 
-This mode is a bit challenging, here you will be having a life bar, and piranha fishes. If you catch piranha fishes, your life will be drained, also catching fish will be a bit challenging.
+This mode is a bit challenging, here you will be having a life bar, and piranha fishes. If you catch piranha fishes, you will lose a life. You need to catch fishes in the objective within 2 minutes.
+Scoring System
+Golden Fish = 15 points, Objective Fishes = 2 points
+Other fishes = -1 points (if target not fulfilled)
+if target fulfilled, +1 points for all normal fishes

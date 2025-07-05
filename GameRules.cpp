@@ -110,7 +110,7 @@ void renderGameRules() {
     SDL_Color bhondo = {255, 255, 255, 255};
     
     renderText(GameRulesRenderer, titleFont, "Game Rules", bhondo, 400, 80);
-    renderWrappedText(GameRulesRenderer, (currentPage == 3)? HardGameRulesFont : GameRulesFont, pageText.c_str(), black, 420, 245, 650);
+    renderWrappedText(GameRulesRenderer, (currentPage >= 2)? HardGameRulesFont : GameRulesFont, pageText.c_str(), black, 420, 245, 650);
     
     if (currentPage > 0) {
         SDL_RenderCopy(GameRulesRenderer, LeftHook, NULL, &ArrowLeftBtn);
