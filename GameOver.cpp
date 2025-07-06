@@ -67,6 +67,8 @@ void renderGameOver()
 {
     if (!gameOverRenderer)
         return;
+    SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
+    SDL_RenderClear(gameOverRenderer);
     std::string text = "files/" + interface + ".txt";
     if (targetScore == 0 && checkHighScore(text.c_str(), fishScore))
     {
@@ -94,8 +96,6 @@ void renderGameOver()
 void renderHighScoreTrue()
 {
     verdict = true;
-    SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
-    SDL_RenderClear(gameOverRenderer);
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
     renderText(gameOverRenderer, smalltitleFont, "Congratulations!", white, 400, 80);
@@ -181,8 +181,6 @@ void renderHighScoreTrue()
 void renderHighScoreFalse()
 {
     verdict = false;
-    SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
-    SDL_RenderClear(gameOverRenderer);
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
     renderText(gameOverRenderer, titleFont, "Oops!", white, 400, 80);

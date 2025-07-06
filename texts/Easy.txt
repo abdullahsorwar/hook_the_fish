@@ -1,3 +1,7 @@
 Easy mode:
 
-It is a very basic mode, you just need to catch as much fishes within 2 minutes else your game will be over
+It is a very basic mode, you just need to catch objective fishes within 2 minutes else your game will be over
+Scoring Rule: 
+Golden Fish worth 20 points
+Objective Fish worth 2 points
+All normal fishes after completing objective worth 1 point 
