@@ -597,7 +597,7 @@ void renderHardInterface()
         SDL_RenderCopy(interfaceRenderer, fishTextures[objectiveFishes[i].type], NULL, &fishRect);
 
         std::string countText = "x " + std::to_string(objectiveFishes[i].count);
-        renderText(interfaceRenderer, buttonFont, countText, black, centerX + 90, centerY + 25);
+        renderText(interfaceRenderer, buttonFont, countText, black, centerX + 100, centerY + 25);
     }
 
     renderHardFishAndRipples();

@@ -544,7 +544,7 @@ void renderMediumInterface() {
         SDL_RenderCopy(interfaceRenderer, fishTextures[objectiveFishes[i].type], NULL, &fishRect);
 
         std::string countText = "x " + std::to_string(objectiveFishes[i].count);
-        renderText(interfaceRenderer, buttonFont, countText, black, centerX + 90, centerY + 25);
+        renderText(interfaceRenderer, buttonFont, countText, black, centerX + 100, centerY + 25);
     }
 
     renderMediumFishAndRipples();
@@ -643,8 +643,8 @@ void renderMediumObjective() {
         SDL_Rect fishRect = {centerX - 60, centerY - 30, 60, 60};
         SDL_RenderCopy(objectiveRenderer, objectiveTextures[i], NULL, &fishRect);
 
-        std::string countText = "x " + std::to_string(objectiveFishes[i].count);
-        renderText(objectiveRenderer, buttonFont, countText, black, centerX + 30, centerY-5);
+        std::string countText = " x " + std::to_string(objectiveFishes[i].count);
+        renderText(objectiveRenderer, buttonFont, countText, black, centerX + 35, centerY-5);
     }
     SDL_RenderPresent(objectiveRenderer);
 }
