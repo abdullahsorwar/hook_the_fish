@@ -67,7 +67,7 @@ void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
         }else if(EasyinterfaceOpen){
             if (type == 0)
             {
-                text.text = "+10";
+                text.text = "+20";
                 text.color = {0, 255, 0, 255};
             }
             else if (type == obj_type && obj_count > 0)

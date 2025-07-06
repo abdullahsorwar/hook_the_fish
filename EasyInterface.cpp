@@ -331,7 +331,7 @@ void handleEasyFishClick(int x, int y)
             {
                 if (fishes[i].type == 0) //type 0 from 1
                 {
-                    fishScore+=10;
+                    fishScore+=20;
                     fishes[i].clicked = true;
                     renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
                     floatingTexts.back().position = {
