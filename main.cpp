@@ -1,5 +1,6 @@
 #include "Common.h"
 #include "NewGame.h"
+#include "About.h"
 #include "MediumInterface.h"
 #include "HardInterface.h"
 #include "EasyInterface.h"
@@ -26,6 +27,7 @@ bool running = true;
 bool soundOn = true;
 bool sunnyOn = true;
 bool objectiveClose = false;
+SDL_Rect aboutbtn = {525, 675, 240, 40};
 
 int main(int argc, char* argv[])
 {
@@ -133,6 +135,17 @@ int main(int argc, char* argv[])
                         }
                     }
                 }
+                if (SDL_PointInRect(&p, &aboutbtn) && !aboutOpen)
+                {
+                    initAbout();
+                    aboutOpen = true;
+                    SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
+                }
+                else if (SDL_PointInRect(&p, &aboutbtn) && aboutOpen)
+                {
+                    SDL_RaiseWindow(aboutWindow);
+                    SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
+                }
             }
 
             if (settingsOpen) {
@@ -156,6 +169,9 @@ int main(int argc, char* argv[])
             if (newgameOpen) {
                 handleNewGameEvents(e, newgameOpen);
             }
+            if (aboutOpen) {
+                handleAboutEvents(e, aboutOpen);
+            }
             if (hardinterfaceOpen) {
                 handleHardInterfaceEvents(e, hardinterfaceOpen);
             } 
@@ -175,7 +191,7 @@ int main(int argc, char* argv[])
 
         SDL_Rect hook1 = {375, 40, 100, 100};
         SDL_Rect hook2 = {415, 40, 100, 100};
-        SDL_Rect copy = {530, 685, 30, 30};
+        SDL_Rect copy = {530, 680, 30, 30};
         SDL_Rect fishrod = {780, 50, 80, 80};
         SDL_RenderCopy(mainRenderer, hookleftTexture, NULL, &hook1);
         SDL_RenderCopy(mainRenderer, hookrightTexture, NULL, &hook2);
@@ -188,7 +204,22 @@ int main(int argc, char* argv[])
             drawParallelogram(mainRenderer, btn, btn.hovered);
             renderText(mainRenderer, buttonFont, btn.text, {255, 255, 255, 255}, btn.rect.x + btn.rect.w / 2, btn.rect.y + btn.rect.h / 2);
         }
-        renderText(mainRenderer, copyrightFont, "   the_primes_of_30", {0, 0, 0, 255}, 640, 700);
+        auto drawRoundedButton = [&](SDL_Rect rect, const std::string& text, SDL_Color fillColor, bool hovered) {
+            int radius = 5;
+            SDL_Color black = {0, 0, 0, 255};
+            roundedBoxRGBA(mainRenderer,
+                        rect.x, rect.y,
+                        rect.x + rect.w, rect.y + rect.h,
+                        radius,
+                        fillColor.r, fillColor.g, fillColor.b,
+                        hovered ? 50 : 0);
+            renderText(mainRenderer, buttonFont, text, black, rect.x + rect.w / 2, rect.y + rect.h / 2);
+        };
+        int mx, my;
+        SDL_GetMouseState(&mx, &my);
+        SDL_Point mousePoint = {mx, my};
+        drawRoundedButton(aboutbtn,"", {255, 255, 255, 255}, SDL_PointInRect(&mousePoint,&aboutbtn));
+        renderText(mainRenderer, copyrightFont, "   the_primes_of_30", {0, 0, 0, 255}, 640, 695);
 
         SDL_RenderPresent(mainRenderer);
 
@@ -216,6 +247,10 @@ int main(int argc, char* argv[])
         if (newgameOpen)
         {
             renderNewGame();
+        }
+        if (aboutOpen)
+        {
+            renderAbout();
         }
         if (hardinterfaceOpen)
         {
@@ -251,6 +286,7 @@ int main(int argc, char* argv[])
     if (isGameRulesOpen()) destroyGameRules();
     if (isControlsOpen()) destroyControls();
     if (isNewGameOpen()) destroyNewGame();
+    if (isAboutOpen()) destroyAbout();
     if (isHardInterfaceOpen()) destroyHardInterface();
     if (isPauseOpen()) destroyPauseMenu();
     if (ispauseExitOpen()) destroyPauseExit();

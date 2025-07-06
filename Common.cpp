@@ -298,6 +298,17 @@ void renderWrappedText(SDL_Renderer* renderer, TTF_Font* font, const std::string
     }
 }
 
+void renderLeftText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y) {
+    SDL_Surface* surface = TTF_RenderText_Blended(font, text.c_str(), color);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    int texW = surface->w;
+    int texH = surface->h;
+    SDL_Rect dstRect = { x, y, texW, texH };
+    SDL_RenderCopy(renderer, texture, NULL, &dstRect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+}
+
 Cloud generateRandomCloud() {
     int dir = (rand() % 2) ? 1 : -1;
     int x = (dir == 1) ? -100 : 1280;

@@ -50,6 +50,7 @@ void drawPondBackground(SDL_Renderer* renderer, int width, int height);
 void drawParallelogram(SDL_Renderer* renderer, Button& btn, bool hovered);
 void renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);
 void renderWrappedText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y, int wrapLength);
+void renderLeftText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);
 
 Cloud generateRandomCloud();
 Fish generateRandomFish();
@@ -89,6 +90,7 @@ extern SDL_Window* menuWindow;
 extern SDL_Window* GameRulesWindow;
 extern SDL_Window* WeatherWindow;
 extern SDL_Window* ControlWindow;
+extern SDL_Window* aboutWindow;
 extern SDL_Window* newgameWindow;
 extern SDL_Window* loadingWindow;
 extern SDL_Window* interfaceWindow;
