@@ -26,6 +26,7 @@ static SDL_Rect mountain = {0, 0, 1280, 250};
 static SDL_Rect inputBox = {250, 200, 300, 50};
 static SDL_Rect confirmButton = {300, 380, 200, 60};
 static SDL_Rect pauseBtn = {1205, 15, 60, 60};
+static SDL_Rect boat = {500, 100, 200, 200};
 
 // Windows and renderers
 //SDL_Window* interfaceWindow = nullptr;
@@ -41,6 +42,7 @@ static SDL_Texture* pondTexture = nullptr;
 static SDL_Texture* pond2Texture = nullptr;
 static SDL_Texture* mountainTexture = nullptr;
 static SDL_Texture* heartTexture = nullptr;
+static SDL_Texture *boatTexture = nullptr;
 static SDL_Texture* fishTextures[12] = {nullptr};          // easy-specific fish
 static SDL_Texture* objectiveTextures[4] = {nullptr};      // for displaying targets
 static SDL_Texture* rippleTextures[4] = {nullptr};         // same ripple animation
@@ -156,6 +158,10 @@ void loadEasyFishAssets() {
 
     surf = IMG_Load("png/teal.png");
     fishTextures[10] = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
+    SDL_FreeSurface(surf);
+
+    surf = IMG_Load("png/fisherman.png");
+    boatTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
 
     // Load ripple animations
@@ -480,7 +486,8 @@ void renderEasyInterface() {
     SDL_RenderCopy(interfaceRenderer, pondTexture, NULL, &pond);
     SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
     SDL_RenderCopy(interfaceRenderer, mountainTexture, NULL, &mountain);
-
+    SDL_RenderCopy(interfaceRenderer, boatTexture, NULL, &boat);
+    
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
 
