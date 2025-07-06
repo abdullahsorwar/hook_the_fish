@@ -359,18 +359,14 @@ void handleMediumFishClick(int x, int y) {
 
                 // If it's not an objective fish, it's a regular fish
                 if (!fishes[i].clicked) {
-                    if(fishScore>0){
+                    if(fishScore>=0){
                         rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -2);
                         floatingTexts.back().position = {
                             fishes[i].rect.x + fishes[i].rect.w / 2,
                             fishes[i].rect.y - 20};
-                        fishScore--;
+                        if(fishScore>0) fishScore--;
                         if (soundOn) Mix_PlayChannel(-1, wrongfish, 0);
                     
-                    }
-                    else if(fishScore==0){
-                        rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -2);
-                        if (soundOn) Mix_PlayChannel(-1, wrongfish, 0);
                     }
                     else if(fishScore>0 && targetScore==0){
                         rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
