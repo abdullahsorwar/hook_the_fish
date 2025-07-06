@@ -460,7 +460,7 @@ void initMediumObjective() {
         std::shuffle(availableTypes.begin(), availableTypes.end(), std::default_random_engine(seed));
         for (int i = 0; i < 5; ++i) {
             objectiveFishes[i].type = availableTypes[i];
-            objectiveFishes[i].count = rand() % 6 + 4;
+            objectiveFishes[i].count = rand() % 3 + 9; // 45-55 fishes
             targetScore += objectiveFishes[i].count;
             loadMediumObjectiveAssets(objectiveFishes[i].type, i);
         }

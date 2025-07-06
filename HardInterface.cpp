@@ -512,7 +512,7 @@ void initHardObjective()
         for (int i = 0; i < 6; ++i)
         {
             objectiveFishes[i].type = availableTypes[i];
-            objectiveFishes[i].count = rand() % 11 + 5;
+            objectiveFishes[i].count = rand() % 3 + 10; // 60-72 fishes
             targetScore += objectiveFishes[i].count;
             loadObjectiveAssets(objectiveFishes[i].type, i);
         }

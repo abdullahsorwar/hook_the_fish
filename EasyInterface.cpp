@@ -456,7 +456,7 @@ void initEasyObjective() {
         std::shuffle(availableTypes.begin(), availableTypes.end(), seed);
         for (int i = 0; i < 4; ++i) { //4
             objectiveFishes[i].type = availableTypes[i];
-            objectiveFishes[i].count = rand() % 3 + 8;
+            objectiveFishes[i].count = rand() % 3 + 8; // 32-40 fishes
             targetScore += objectiveFishes[i].count;
             loadEasyObjectiveAssets(objectiveFishes[i].type, i);
         }
