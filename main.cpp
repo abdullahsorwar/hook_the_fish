@@ -14,6 +14,9 @@
 #include <vector>
 #include <cmath>
 #include <ctime>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+
 
 std::vector<Cloud>clouds;
 std::vector<Fish>fishes;
@@ -39,6 +42,8 @@ int main(int argc, char* argv[])
 
     SDL_Window* mainWindow = SDL_CreateWindow("Hook the Fish", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_BORDERLESS);
     SDL_Renderer* mainRenderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Surface* cursorSurface = IMG_Load("png/hook.png");
+    SDL_Cursor* cursor = SDL_CreateColorCursor(cursorSurface, 10, 20); 
 
     TTF_Font* titleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 96);
     TTF_Font* buttonFont = TTF_OpenFont("fonts/OpenSans-Bold.ttf", 32);
@@ -66,6 +71,17 @@ int main(int argc, char* argv[])
         {{280, 450, 250, 80}, "Settings"},
         {{730, 500, 250, 80}, "Exit"}
     };
+
+
+if (!cursorSurface) {
+    SDL_Log("Failed to load cursor image: %s", IMG_GetError());
+}
+
+if (!cursor) {
+    SDL_Log("Failed to create cursor: %s", SDL_GetError());
+}
+
+SDL_SetCursor(cursor);
 
     bool newgameOpen = false;
     bool highscoresOpen = false;
@@ -299,6 +315,9 @@ int main(int argc, char* argv[])
     Mix_FreeMusic(game_music);
     Mix_CloseAudio();
     SDL_Quit();
+
+    SDL_FreeSurface(cursorSurface);
+    SDL_FreeCursor(cursor);
 
     return 0;
 }
