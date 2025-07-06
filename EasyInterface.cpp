@@ -28,16 +28,10 @@ static SDL_Rect confirmButton = {300, 380, 200, 60};
 static SDL_Rect pauseBtn = {1205, 15, 60, 60};
 static SDL_Rect boat = {500, 100, 200, 200};
 
-// Windows and renderers
-//SDL_Window* interfaceWindow = nullptr;
 SDL_Window* EasyobjectiveWindow = nullptr;
-//SDL_Window* EasygamewinWindow = nullptr;
 
-//SDL_Renderer* interfaceRenderer = nullptr;
 static SDL_Renderer* EasyobjectiveRenderer = nullptr;
-//static SDL_Renderer* gamewinRenderer = nullptr;
 
-// Textures (use different fish/backgrounds in Easy mode)
 static SDL_Texture* pondTexture = nullptr;
 static SDL_Texture* pond2Texture = nullptr;
 static SDL_Texture* mountainTexture = nullptr;
@@ -63,14 +57,7 @@ static const Uint32 TIMER_DURATION = 120000; // 2 minutes
 
 bool EasyinterfaceOpen = false;  // renamed for Easy
 
-// Game Win Input State
-/*std::string EasyuserInput = "";
-std::string EasyfinalText = "";
-std::string Easyconf = "";
 
-static bool inputActive = false;
-static bool showCursor = true;*/
-//static bool gamewinOpen = false;
 
 static Uint32 lastCursorToggle = 0;
 
@@ -89,10 +76,10 @@ struct PondFish {
     bool clicked;
 };
 
-//static ObjectiveFish objectiveFishes[4]; //can reduce number of objectives for easy
+
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
-//static Uint32 remaining = TIMER_DURATION;
+
 static std::vector<int> availableTypes(10); // could be adjusted (fewer types for easier mode)
 
 std::string EasygetFormattedTime() {
@@ -165,7 +152,7 @@ void loadEasyFishAssets() {
     SDL_FreeSurface(surf);
 
     // Load ripple animations
-    for (int i = 0; i < 4; ++i) { //why 4?
+    for (int i = 0; i < 4; ++i) { 
         std::string filename = "bmp/ripple" + std::to_string(i) + ".bmp";
         SDL_Surface* rippleSurf = SDL_LoadBMP(filename.c_str());
         rippleTextures[i] = SDL_CreateTextureFromSurface(interfaceRenderer, rippleSurf);
@@ -359,7 +346,7 @@ void handleEasyFishClick(int x, int y)
                     floatingTexts.back().position = {
                     fishes[i].rect.x + fishes[i].rect.w / 2,
                     fishes[i].rect.y - 20};
-                    if (soundOn) Mix_PlayChannel(-1, wrongfish, 0); // should remove it??
+                    if (soundOn) Mix_PlayChannel(-1, wrongfish, 0); 
                     break;
                 }
                 else if (targetScore > 0)
@@ -643,98 +630,6 @@ void renderEasyObjective() {
     SDL_RenderPresent(EasyobjectiveRenderer);
 }
 
-/*void EasyinitgameWin()
-{
-    if (EasygamewinWindow != nullptr) return;
-
-    EasygamewinWindow = SDL_CreateWindow("Winner!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
-    gamewinRenderer = SDL_CreateRenderer(EasygamewinWindow, -1, SDL_RENDERER_ACCELERATED);
-
-    typeFont = TTF_OpenFont ("fonts/Arial.ttf", 24);
-    SDL_StartTextInput();
-}*/
-
-/*void EasyrenderGameWin() {
-    if (!gamewinRenderer) return;
-
-    SDL_SetRenderDrawColor(gamewinRenderer, 20, 20, 40, 255);
-    SDL_RenderClear(gamewinRenderer);
-
-    SDL_Color white = {255, 255, 255, 255};
-    SDL_Color black = {0, 0, 0, 255};
-    renderText(gamewinRenderer, smalltitleFont, "Congratulations!", white, 400, 80);
-
-    int mx, my;
-    SDL_GetMouseState(&mx, &my);
-    SDL_Point mousePoint = {mx, my};
-
-    Easyconf = (EasyfinalText == "0") ? "Exit" : "Confirm";
-    Button confirmBtn = {confirmButton, Easyconf, false};
-    confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
-
-    drawParallelogram(gamewinRenderer, confirmBtn, confirmBtn.hovered);
-    renderText(gamewinRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
-
-    auto drawRoundedButton = [&](SDL_Rect rect, const std::string& text, SDL_Color fillColor) {
-        int radius = 5;
-        roundedBoxRGBA(gamewinRenderer,
-                       rect.x, rect.y,
-                       rect.x + rect.w, rect.y + rect.h,
-                       radius,
-                       fillColor.r, fillColor.g, fillColor.b, 100);
-        renderText(gamewinRenderer, buttonFont, text, black, rect.x + rect.w / 2, rect.y + rect.h / 2);
-    };
-    SDL_Color faded = {255, 255, 255, 255};
-    drawRoundedButton(inputBox, "", faded);
-
-    if (SDL_GetTicks() - lastCursorToggle > 500) {
-        showCursor = !showCursor;
-        lastCursorToggle = SDL_GetTicks();
-    }
-
-    renderText(gamewinRenderer, textFont, "Enter your name: ", white, 400, 150);
-
-    // --- Centered and Scrolling Text ---
-    std::string displayText = EasyuserInput;
-    if (inputActive && showCursor) {
-        displayText += "|";
-    }
-
-    // Measure full text width
-    int textWidth = 0, textHeight = 0;
-    TTF_SizeText(typeFont, displayText.c_str(), &textWidth, &textHeight);
-
-    // Scroll if text is wider than box
-    int maxVisibleWidth = inputBox.w - 20;
-    std::string visibleText = displayText;
-    while (!visibleText.empty()) {
-        TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, nullptr);
-        if (textWidth <= maxVisibleWidth) break;
-        visibleText.erase(0, 1);  // Scroll left
-    }
-
-    // Center visible text inside inputBox
-    TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, &textHeight);
-    int textX = inputBox.x + inputBox.w / 2;
-    int textY = inputBox.y + inputBox.h / 2;
-
-    // Render the user input
-    renderText(gamewinRenderer, typeFont, visibleText, white, textX, textY);
-
-    // Success message
-    if (EasyfinalText == "0") {
-        renderText(gamewinRenderer, messageFont, "Entry Successful!", white, 400, 300);
-    }
-    else if (EasyfinalText == "18") {
-        renderText(gamewinRenderer, messageFont, "Invalid name: must not exceed 18 characters.", white, 400, 300);
-    }
-    else if (EasyfinalText == "-1") {
-        renderText(gamewinRenderer, messageFont, "Invalid name: only A-Z, a-z, 0-9, and", white, 400, 300);
-        renderText(gamewinRenderer, messageFont, "underscores (_) allowed. No spaces!", white, 400, 350);
-    }
-
-    SDL_RenderPresent(gamewinRenderer);
-}*/
 
 void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
     if (!interfaceWindow) return;
@@ -789,37 +684,6 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
         }
     }
 
-    /*if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(EasygamewinWindow)) {
-        if (gamewinOpen) {
-            int mx = e.button.x;
-            int my = e.button.y;
-
-            if (mx >= inputBox.x && mx <= inputBox.x + inputBox.w &&
-                my >= inputBox.y && my <= inputBox.y + inputBox.h) {
-                inputActive = true;
-            } else {
-                inputActive = false;
-            }
-
-            if (mx >= confirmButton.x && mx <= confirmButton.x + confirmButton.w &&
-                my >= confirmButton.y && my <= confirmButton.y + confirmButton.h && Easyconf == "Confirm") {
-                EasyfinalText = checkAndAddHighScore("files/easy.txt", EasyuserInput, fishScore);
-            }
-
-            SDL_Rect backBtnRect = {300, 380, 200, 60};
-            SDL_GetMouseState(&mx, &my);
-            SDL_Point mousePoint = {mx, my};
-
-            if (SDL_PointInRect(&mousePoint, &backBtnRect) && Easyconf == "Exit") {
-                SDL_DestroyRenderer(gamewinRenderer);
-                SDL_DestroyWindow(EasygamewinWindow);
-                gamewinOpen = false;
-                gamewinRenderer = nullptr;
-                EasygamewinWindow = nullptr;
-                destroyEasyInterface();
-            }
-        }
-    }*/
 
     
 
@@ -853,17 +717,7 @@ void handleEasyInterfaceLogics() {
         initGameOver();
     }
     
-    /*if (remaining == 0)
-    {
-        if (targetScore == 0 && !gamewinOpen) {
-            EasyinitgameWin();
-            gamewinOpen = true;
-        }
-        else if (targetScore != 0) {
-            destroyEasyInterface();
-            timerRunning = false;
-        }
-    }*/
+    
 }
 
 
@@ -928,7 +782,7 @@ void destroyEasyInterface() {
     remaining = 120000;
 
     Mix_FreeChunk(bonuscatch);
-    //Mix_FreeChunk(crocodile);
+    
     Mix_FreeChunk(rightfish);
     Mix_FreeChunk(wrongfish);
 

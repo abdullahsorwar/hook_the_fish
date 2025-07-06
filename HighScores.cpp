@@ -84,7 +84,7 @@ std::string checkAndAddHighScore(const std::string& filename, const std::string&
     loadScoresFromFile(filename);
 
     if (loadedScores.size() < 5 || newScore > loadedScores.back().second) {
-        std::cout << "You made a High Score!\n";
+        //std::cout << "You made a High Score!\n";
         loadedScores.emplace_back(playerName, newScore);
 
         std::sort(loadedScores.begin(), loadedScores.end(), [](const auto& a, const auto& b) {
@@ -102,7 +102,8 @@ std::string checkAndAddHighScore(const std::string& filename, const std::string&
         }
         for (const auto& entry : loadedScores) {
             outFile << entry.first << " " << entry.second << "\n";
-            std::cout << "Writing: " << entry.first << " " << entry.second << std::endl;
+            
+            //std::cout << "Writing: " << entry.first << " " << entry.second << std::endl;
         }
     }
     return "0";
