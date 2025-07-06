@@ -72,6 +72,10 @@ void renderGameOver()
     {
         renderHighScoreTrue();
     }
+    else if (targetScore == 0 && !checkHighScore(text.c_str(), fishScore))
+    {
+        renderHighScoreFalse();
+    }
     else if (lives == 0)
     {
         renderLifeOver();
@@ -84,28 +88,6 @@ void renderGameOver()
     {
         renderTimeOver();
     }
-
-    /*else
-    {
-        SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
-        SDL_RenderClear(gameOverRenderer);
-        SDL_Color white = {255, 255, 255, 255};
-        SDL_Color black = {0, 0, 0, 255};
-        renderText(gameOverRenderer, titleFont, "Oops!", white, 400, 80);
-
-        int mx, my;
-        SDL_GetMouseState(&mx, &my);
-        SDL_Point mousePoint = {mx, my};
-
-        conf = "Exit";
-        Button confirmBtn = {confirmButton, conf, false};
-        confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
-
-        drawParallelogram(gameOverRenderer, confirmBtn, confirmBtn.hovered);
-        renderText(gameOverRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
-
-        renderText(gameOverRenderer, textFont, "Under Construction!", white, 400, 150);
-    }*/
     SDL_RenderPresent(gameOverRenderer);
 }
 
@@ -194,6 +176,29 @@ void renderHighScoreTrue()
         renderText(gameOverRenderer, messageFont, "Invalid name: Only A-Z, a-z, 0-9, and", white, 400, 300);
         renderText(gameOverRenderer, messageFont, "Underscores (_) allowed. No spaces!", white, 400, 350);
     }
+}
+
+void renderHighScoreFalse()
+{
+    verdict = false;
+    SDL_SetRenderDrawColor(gameOverRenderer, 20, 20, 40, 255);
+    SDL_RenderClear(gameOverRenderer);
+    SDL_Color white = {255, 255, 255, 255};
+    SDL_Color black = {0, 0, 0, 255};
+    renderText(gameOverRenderer, titleFont, "Oops!", white, 400, 80);
+
+    int mx, my;
+    SDL_GetMouseState(&mx, &my);
+    SDL_Point mousePoint = {mx, my};
+
+    Button confirmBtn = {confirmButton, "Exit", false};
+    confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
+
+    drawParallelogram(gameOverRenderer, confirmBtn, confirmBtn.hovered);
+    renderText(gameOverRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
+
+    renderText(gameOverRenderer, textFont, "Your try wasn't good enough! Try more to", white, 400, 220);
+    renderText(gameOverRenderer, textFont, "score higher next time!", white, 400, 260);
 }
 
 void renderTimeOver()
@@ -331,6 +336,10 @@ void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
     {
         handleHighScoreTrue(e, gameoverOpen);
     }
+    else if (gameoverOpen && !verdict)
+    {
+        handleHighScoreFalse(e, gameoverOpen);
+    }
     else if (remaining==0 && targetScore!=0)
     {
         handleTimeOverEvents(e, gameoverOpen); 
@@ -341,9 +350,7 @@ void handleGameOverEvents(SDL_Event &e, bool &gameoverOpen)
     }
     else if (crocodiletouch)
     {
-
         handleCrocodileOverEvents(e, gameoverOpen);
-
     }
 }   
 
@@ -390,6 +397,22 @@ void handleHighScoreTrue(SDL_Event &e, bool &gameoverOpen)
             {
                 userInput.pop_back();
             }
+        }
+    }
+}
+
+void handleHighScoreFalse(SDL_Event &e, bool &crocodiletouch)
+{
+    if (e.type == SDL_MOUSEBUTTONDOWN && e.window.windowID == SDL_GetWindowID(gameOverWindow))
+    {
+        int mx = e.button.x;
+        int my = e.button.y;
+        SDL_Rect backBtnRect = {300, 380, 200, 60};
+        SDL_GetMouseState(&mx, &my);
+        SDL_Point mousePoint = {mx, my};
+        if (SDL_PointInRect(&mousePoint, &backBtnRect))
+        {
+            destroyGameOver();
         }
     }
 }

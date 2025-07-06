@@ -353,7 +353,6 @@ void handleEasyFishClick(int x, int y)
                 
                 else if(i>4)
                 {
-                    printf("type %d\n",fishes[i].type);
                     //if (fishScore > 0) fishScore--;
                     fishes[i].clicked = true;
                     renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
@@ -369,7 +368,6 @@ void handleEasyFishClick(int x, int y)
                     {
                         if (fishes[i].type == objectiveFishes[j].type && objectiveFishes[j].count > 0)
                         {
-                            printf("Click on %d, {%d %d %d %d}\n",fishes[i].type,availableTypes[0],availableTypes[1],availableTypes[2],availableTypes[3]);
                             fishScore++;
                             targetScore--;
                             renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
@@ -487,7 +485,7 @@ void renderEasyInterface() {
     SDL_RenderCopy(interfaceRenderer, pond2Texture, NULL, &pond2);
     SDL_RenderCopy(interfaceRenderer, mountainTexture, NULL, &mountain);
     SDL_RenderCopy(interfaceRenderer, boatTexture, NULL, &boat);
-    
+
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color black = {0, 0, 0, 255};
 
