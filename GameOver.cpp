@@ -43,7 +43,7 @@ void initGameOver()
 
     gameOverWindow = SDL_CreateWindow("Game Over",
                                       SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                      800, 480, SDL_WINDOW_BORDERLESS);
+                                      800, 480, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
     gameOverRenderer = SDL_CreateRenderer(gameOverWindow, -1, SDL_RENDERER_ACCELERATED);
 
     titleFont = TTF_OpenFont("fonts/LuckiestGuy-Regular.ttf", 96);
