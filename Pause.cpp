@@ -130,6 +130,25 @@ void loadHardPauseObjectiveAssets(int type, int index)
     }
 }
 
+void loadMediumPauseObjectiveAssets(int type, int index)
+{
+    const char* fishPaths[12] = {
+        "png/brown.png", "png/emerald.png", "png/green.png",
+        "png/lavender.png", "png/olive.png", "png/orange.png", "png/purple.png",
+        "png/red.png", "png/silver.png", "png/teal.png", "png/piranha.png", "png/golden.png"
+    };
+
+    SDL_Surface* surf = nullptr;
+
+    surf = IMG_Load(fishPaths[type]);
+
+    if (surf != nullptr) {
+        objectiveTextures[index] = SDL_CreateTextureFromSurface(pauseObjectiveRenderer, surf);
+        SDL_FreeSurface(surf);
+    }
+
+}
+
 void initPauseMenu()
 {
     if (pauseWindow != nullptr)
@@ -171,6 +190,13 @@ void initPauseObjective()
         for (int i = 0; i < 6; i++)
         {
             loadHardPauseObjectiveAssets(objectiveFishes[i].type, i);
+        }
+    }
+    else if (MediuminterfaceOpen)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            loadMediumPauseObjectiveAssets(objectiveFishes[i].type, i);
         }
     }
 }
@@ -324,6 +350,22 @@ void renderPauseObjective()
             std::string countText = " x " + std::to_string(objectiveFishes[i].count);
             renderText(pauseObjectiveRenderer, buttonFont, countText, black, centerX + 35, centerY - 5);
         }
+    }
+    else if (MediuminterfaceOpen)
+    {
+        for (int i = 0; i < 5; ++i) {
+        int col = (i < 3) ? 0 : 1;
+        int row = (i < 3) ? i: i-3;
+
+        int centerX = (col == 0) ? 150 : 520;
+        int centerY = 150 + row * 70;
+
+        SDL_Rect fishRect = {centerX, centerY, 60, 60};
+        SDL_RenderCopy(pauseObjectiveRenderer, objectiveTextures[i], NULL, &fishRect);
+
+        std::string countText = "x " + std::to_string(objectiveFishes[i].count);
+        renderText(pauseObjectiveRenderer, buttonFont, countText, black, centerX + 90, centerY + 25);
+    }
     }
     SDL_RenderPresent(pauseObjectiveRenderer);
 }

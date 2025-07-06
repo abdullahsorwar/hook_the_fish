@@ -9,6 +9,7 @@ extern Uint32 pauseStartTime;
 extern Uint32 totalPaused;
 void loadEasyPauseObjectiveAssets(int type, int index);
 void loadHardPauseObjectiveAssets(int type, int index);
+void loadMediumPauseObjectiveAssets(int type, int index);
 
 void initPauseMenu();
 void renderPauseMenu();
