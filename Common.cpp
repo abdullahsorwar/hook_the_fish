@@ -72,7 +72,7 @@ void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
             }
             else if (type == obj_type && obj_count > 0)
             {
-                text.text = "+1";
+                text.text = "+2";
                 text.color = {0, 255, 0, 255};
             }
             else if (type == obj_type && obj_count == 0)

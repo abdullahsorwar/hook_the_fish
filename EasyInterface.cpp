@@ -355,7 +355,7 @@ void handleEasyFishClick(int x, int y)
                     {
                         if (fishes[i].type == objectiveFishes[j].type && objectiveFishes[j].count > 0)
                         {
-                            fishScore++;
+                            fishScore+=2;
                             targetScore--;
                             renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
                             floatingTexts.back().position = {
