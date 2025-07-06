@@ -100,15 +100,6 @@ std::string getMediumFormattedTime() {
     if (elapsed >= 120000) {
         elapsed = 120000;  
         timerRunning = false;
-        // Add game over logic here if needed 
-        /*if(GameOverOpen){
-            SDL_Event e;
-            while(SDL_PollEvent(&e)){
-                handleGameOverEvents(e, GameOverOpen);
-            }
-            renderGameOver();
-            SDL_Delay(16);    
-        }*/
     }
     
     remaining = 120000-elapsed;
