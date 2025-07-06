@@ -54,7 +54,7 @@ bool MediuminterfaceOpen = false;
 bool isLifeLost = false;
 static bool timerStarted = false;
 static bool congratulationsFlag = false;
-
+/*
 std::string mediumuserInput = "";
 std::string mediumfinalText = "";
 std::string mediumconf = "";
@@ -64,6 +64,7 @@ static bool showCursor = true;
 static bool gamewinOpen = false;
 
 static Uint32 lastCursorToggle = 0;
+*/
 
 struct PondFish {
     SDL_Rect rect;
@@ -477,100 +478,6 @@ void initMediumObjective() {
     }
 }
 
-/*
-void mediuminitgameWin()
-{
-    if (mediumGameWinWindow != nullptr) return;
-
-    mediumGameWinWindow = SDL_CreateWindow("Winner!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
-    gamewinRenderer = SDL_CreateRenderer(mediumGameWinWindow, -1, SDL_RENDERER_ACCELERATED);
-
-    typeFont = TTF_OpenFont ("fonts/Arial.ttf", 24);
-    SDL_StartTextInput();
-}
-
-void mediumrenderGameWin() {
-    if (!gamewinRenderer) return;
-
-    SDL_SetRenderDrawColor(gamewinRenderer, 20, 20, 40, 255);
-    SDL_RenderClear(gamewinRenderer);
-
-    SDL_Color white = {255, 255, 255, 255};
-    SDL_Color black = {0, 0, 0, 255};
-    renderText(gamewinRenderer, smalltitleFont, "Congratulations!", white, 400, 80);
-
-    int mx, my;
-    SDL_GetMouseState(&mx, &my);
-    SDL_Point mousePoint = {mx, my};
-
-    mediumconf = (mediumfinalText == "0") ? "Exit" : "Confirm";
-    Button confirmBtn = {confirmButton, mediumconf, false};
-    confirmBtn.hovered = SDL_PointInRect(&mousePoint, &confirmBtn.rect);
-
-    drawParallelogram(gamewinRenderer, confirmBtn, confirmBtn.hovered);
-    renderText(gamewinRenderer, buttonFont, confirmBtn.text, white, confirmBtn.rect.x + confirmBtn.rect.w / 2, confirmBtn.rect.y + confirmBtn.rect.h / 2);
-
-    auto drawRoundedButton = [&](SDL_Rect rect, const std::string& text, SDL_Color fillColor) {
-        int radius = 5;
-        roundedBoxRGBA(gamewinRenderer,
-                       rect.x, rect.y,
-                       rect.x + rect.w, rect.y + rect.h,
-                       radius,
-                       fillColor.r, fillColor.g, fillColor.b, 100);
-        renderText(gamewinRenderer, buttonFont, text, black, rect.x + rect.w / 2, rect.y + rect.h / 2);
-    };
-    SDL_Color faded = {255, 255, 255, 255};
-    drawRoundedButton(inputBox, "", faded);
-
-    if (SDL_GetTicks() - lastCursorToggle > 500) {
-        showCursor = !showCursor;
-        lastCursorToggle = SDL_GetTicks();
-    }
-
-    renderText(gamewinRenderer, textFont, "Enter your name: ", white, 400, 150);
-
-    // --- Centered and Scrolling Text ---
-    std::string displayText = mediumuserInput;
-    if (inputActive && showCursor) {
-        displayText += "|";
-    }
-
-    // Measure full text width
-    int textWidth = 0, textHeight = 0;
-    TTF_SizeText(typeFont, displayText.c_str(), &textWidth, &textHeight);
-
-    // Scroll if text is wider than box
-    int maxVisibleWidth = inputBox.w - 20;
-    std::string visibleText = displayText;
-    while (!visibleText.empty()) {
-        TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, nullptr);
-        if (textWidth <= maxVisibleWidth) break;
-        visibleText.erase(0, 1);  // Scroll left
-    }
-
-    // Center visible text inside inputBox
-    TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, &textHeight);
-    int textX = inputBox.x + inputBox.w / 2;
-    int textY = inputBox.y + inputBox.h / 2;
-
-    // Render the user input
-    renderText(gamewinRenderer, typeFont, visibleText, white, textX, textY);
-
-    // Success message
-    if (mediumfinalText == "0") {
-        renderText(gamewinRenderer, messageFont, "Entry Successful!", white, 400, 300);
-    }
-    else if (mediumfinalText == "18") {
-        renderText(gamewinRenderer, messageFont, "Invalid name: must not exceed 18 characters.", white, 400, 300);
-    }
-    else if (mediumfinalText == "-1") {
-        renderText(gamewinRenderer, messageFont, "Invalid name: only A-Z, a-z, 0-9, and", white, 400, 300);
-        renderText(gamewinRenderer, messageFont, "underscores (_) allowed. No spaces!", white, 400, 350);
-    }
-
-    SDL_RenderPresent(gamewinRenderer);
-}
-    */
 
 void renderMediumInterface() {
     if (!interfaceRenderer || isPaused) return;
@@ -907,6 +814,7 @@ void destroyMediumInterface() {
     // Reset game state
     fishScore = 0;
     lives = 3;
+    /*
     mediumuserInput = "";
     mediumfinalText = "";
     mediumconf = "";
@@ -914,6 +822,7 @@ void destroyMediumInterface() {
     showCursor = true;
     gamewinOpen = false;
     lastCursorToggle = 0;
+    */
     remaining = 120000;
     remaining_time = 120000;
     totalPaused = 0;
