@@ -204,7 +204,7 @@ void spawnMediumFish() {
 
     // Handle objective fishes (for the next group)
     for (int i = 7; i < MAX_FISH; ++i) {
-        if (!fishes[i].active && rand() % 150 == 0) {
+        if (!fishes[i].active && rand() % 250 == 0) {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
