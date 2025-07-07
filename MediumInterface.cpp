@@ -732,10 +732,10 @@ void handleMediumInterfaceLogics(SDL_Event& e, bool& interfaceWindow){
 void destroyMediumInterface() {
     
     // Reset all static positions
-    pond = {0, 250, 1280, 470};
+    /*pond = {0, 250, 1280, 470};
     pond2 = {-1279, 250, 1280, 470};
     mountain = {0, 0, 1280, 250};
-    mountain2 = {-1279, 0, 1280, 250};
+    mountain2 = {-1279, 0, 1280, 250};*/
 
     if (objectiveRenderer) {
         SDL_DestroyRenderer(objectiveRenderer);
@@ -792,7 +792,7 @@ void destroyMediumInterface() {
     for (auto& tex : objectiveTextures) {
         if (tex) SDL_DestroyTexture(tex);
     }
-    objectiveTextures.clear();
+    // objectiveTextures.clear();
 
     // Add this after your current objective reset
     for (int i = 0; i < 5; ++i) {
