@@ -303,6 +303,8 @@ SDL_SetCursor(cursor);
     if (isControlsOpen()) destroyControls();
     if (isNewGameOpen()) destroyNewGame();
     if (isAboutOpen()) destroyAbout();
+    if (isEasyInterfaceOpen()) destroyEasyInterface();
+    if (isMediumInterfaceOpen()) destroyMediumInterface();
     if (isHardInterfaceOpen()) destroyHardInterface();
     if (isPauseOpen()) destroyPauseMenu();
     if (ispauseExitOpen()) destroyPauseExit();
