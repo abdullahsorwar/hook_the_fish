@@ -43,13 +43,17 @@ SDL2 (Simple Directmedia Layer 2)
     <li>How To Play</li>
     <li>Weather</li>
   </ul></li>
+  <li>About</li>
   <li>Exit</li>
 </ol>
 <h3>Added Functionalities</h3>
 <ul>
-  <li>Flashing Effects</li>
-  <li>Fish Interaction with Mouse</li>
+  <li>Flashing Effects while Button Interaction</li>
+  <li>Main Menu Fish reaction while Mouse Interaction</li>
   <li>Auto Sound/Weather Update Save</li>
-  <li>High Scores Save</li>
-  <li>Playable Modes: Easy, Medium, Hard (Beta)</li>
+  <li>Dynamic High Score Update</li>
+  <li>Two Different Playable Weather: Sunny and Rainy</li>
+  <li>Playable Modes: Easy, Medium, Hard; each having different play conditions</li>
+  <li>In-Game Pause Menu to naturally Quit Game, Sound On/Off or going through Game Rules</li>
+  <li>In-Game Randomized Objective Fishes</li>
 </ul>
