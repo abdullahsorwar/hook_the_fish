@@ -12,8 +12,8 @@ University Project
 C++
 <h2>Third-Party Libraries</h2>
 SDL2 (Simple Directmedia Layer 2)
-<h2>Status</h2>
-<h3>Added Menus</h3>
+<h2>Game Structure</h2>
+<h3>Menus</h3>
 <ol>
   <li>New Game<ul>
     <li>Easy<ul>
@@ -46,7 +46,7 @@ SDL2 (Simple Directmedia Layer 2)
   <li>About</li>
   <li>Exit</li>
 </ol>
-<h3>Added Functionalities</h3>
+<h3>Functionalities</h3>
 <ul>
   <li>Flashing Effects while Button Interaction</li>
   <li>Main Menu Fish reaction while Mouse Interaction</li>
