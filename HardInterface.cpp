@@ -798,7 +798,7 @@ void handleHardInterfaceLogics()
     else if (((remaining % 60000) / 500) % 2 == 0 && !crocodiletouch)
     {
         crocodileRect.x -=1;
-        if (crocodileRect.x <= 680)
+        if (crocodileRect.x <= 680 && !gameoverOpen)
         {
             crocodiletouch = true;
             Mix_PlayChannel(-1, crocodile, 0);

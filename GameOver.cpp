@@ -82,13 +82,13 @@ void renderGameOver()
     {
         renderLifeOver();
     }
+    else if (remaining==0 && targetScore!=0 && !crocodiletouch)
+    {
+        renderTimeOver();
+    }
     else if (crocodiletouch)
     {
         renderCrocodileOver();
-    }
-    else if (remaining==0 && targetScore!=0)
-    {
-        renderTimeOver();
     }
     SDL_RenderPresent(gameOverRenderer);
 }
