@@ -117,4 +117,3 @@ void destroyWeather() {
 bool isWeatherOpen() {
     return WeatherWindow != nullptr;
 }
-

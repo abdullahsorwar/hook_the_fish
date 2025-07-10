@@ -166,4 +166,3 @@ void destroyGameRules() {
 bool isGameRulesOpen() {
     return GameRulesWindow != nullptr;
 }
-

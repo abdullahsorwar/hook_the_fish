@@ -1,5 +1,5 @@
 #include "Common.h"
-#include "EasyInterface.h"  // use Easy version
+#include "EasyInterface.h"
 #include "HighScores.h"
 #include "Pause.h"
 #include "Rain.h"
@@ -16,10 +16,9 @@
 #include <cmath>
 #include <cstdlib>
 
-#define MAX_FISH 10//11
+#define MAX_FISH 10
 #define PI acos(-1)
 
-// Scene layout
 static SDL_Rect pond = {0, 250, 1280, 470};
 static SDL_Rect pond2 = {-1279, 250, 1280, 470};
 static SDL_Rect mountain = {0, 0, 1280, 250};
@@ -37,11 +36,10 @@ static SDL_Texture* pond2Texture = nullptr;
 static SDL_Texture* mountainTexture = nullptr;
 static SDL_Texture* heartTexture = nullptr;
 static SDL_Texture *boatTexture = nullptr;
-static SDL_Texture* fishTextures[12] = {nullptr};          // easy-specific fish
-static SDL_Texture* objectiveTextures[4] = {nullptr};      // for displaying targets
-static SDL_Texture* rippleTextures[4] = {nullptr};         // same ripple animation
+static SDL_Texture* fishTextures[12] = {nullptr};          
+static SDL_Texture* objectiveTextures[4] = {nullptr};      
+static SDL_Texture* rippleTextures[4] = {nullptr};         
 
-// Fonts
 static TTF_Font* titleFont = nullptr;
 static TTF_Font* smalltitleFont = nullptr;
 static TTF_Font* buttonFont = nullptr;
@@ -53,15 +51,11 @@ static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
 static bool congratulationsFlag = false;
-static const Uint32 TIMER_DURATION = 120000; // 2 minutes
-
-bool EasyinterfaceOpen = false;  // renamed for Easy
-
-
+static const Uint32 TIMER_DURATION = 120000; 
+bool EasyinterfaceOpen = false;
 
 static Uint32 lastCursorToggle = 0;
 
-// Fish structure
 struct PondFish {
     SDL_Rect rect;
     float arcHeight;
@@ -80,7 +74,7 @@ struct PondFish {
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 
-static std::vector<int> availableTypes(10); // could be adjusted (fewer types for easier mode)
+static std::vector<int> availableTypes(10);
 
 std::string EasygetFormattedTime() {
     if (!timerRunning) return "02:00";
@@ -150,14 +144,6 @@ void loadEasyFishAssets() {
     surf = IMG_Load("png/fisherman.png");
     boatTexture = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
     SDL_FreeSurface(surf);
-
-    // Load ripple animations
-    for (int i = 0; i < 4; ++i) { 
-        std::string filename = "bmp/ripple" + std::to_string(i) + ".bmp";
-        SDL_Surface* rippleSurf = SDL_LoadBMP(filename.c_str());
-        rippleTextures[i] = SDL_CreateTextureFromSurface(interfaceRenderer, rippleSurf);
-        SDL_FreeSurface(rippleSurf);
-    }
 }
 
 void loadEasyObjectiveAssets(int type, int index) {
@@ -201,7 +187,7 @@ void loadEasyObjectiveAssets(int type, int index) {
 }
 
 void spawnEasyFish() {
-    for (int i = 0; i < 4; ++i) { //4
+    for (int i = 0; i < 4; ++i) { 
         if (!fishes[i].active && rand() % 20 == 0) {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % 200 + 400;
@@ -221,12 +207,12 @@ void spawnEasyFish() {
             fishes[i].clicked = false;
         }
     }
-    for (int i = 4; i < 5; ++i) { //4, i<5
+    for (int i = 4; i < 5; ++i) { 
         if (!fishes[i].active && rand() % 50 == 0) {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
-            int type = i-4; //i-4
+            int type = i-4; 
             
             fishes[i].arcHeight = rand() % 60 + 70;
             fishes[i].rect.x = fishes[i].baseX;
@@ -241,12 +227,12 @@ void spawnEasyFish() {
             fishes[i].clicked = false;
         }
     }
-    for (int i = 5; i < MAX_FISH; ++i) { //5 - MAX_FISH
+    for (int i = 5; i < MAX_FISH; ++i) { 
         if (!fishes[i].active && rand() % 200 == 0) {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
-            int type =availableTypes[5+rand()%5]; //11
+            int type =availableTypes[5+rand()%5]; 
             
             fishes[i].arcHeight = rand() % 60 + 70;
             fishes[i].rect.x = fishes[i].baseX;
@@ -316,7 +302,7 @@ void handleEasyFishClick(int x, int y)
             x >= fishes[i].rect.x && x <= fishes[i].rect.x + fishes[i].rect.w &&
             y >= fishes[i].rect.y && y <= fishes[i].rect.y + fishes[i].rect.h)
             {
-                if (fishes[i].type == 0) //type 0 from 1
+                if (fishes[i].type == 0) 
                 {
                     fishScore+=20;
                     fishes[i].clicked = true;
@@ -340,7 +326,6 @@ void handleEasyFishClick(int x, int y)
                 
                 else if(i>4)
                 {
-                    //if (fishScore > 0) fishScore--;
                     fishes[i].clicked = true;
                     renderFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
                     floatingTexts.back().position = {
@@ -351,7 +336,7 @@ void handleEasyFishClick(int x, int y)
                 }
                 else if (targetScore > 0)
                 {
-                    for (int j=0; j < 4 && !fishes[i].clicked; j++) //chnaged to 4 frm 6
+                    for (int j=0; j < 4 && !fishes[i].clicked; j++) 
                     {
                         if (fishes[i].type == objectiveFishes[j].type && objectiveFishes[j].count > 0)
                         {
@@ -369,7 +354,6 @@ void handleEasyFishClick(int x, int y)
                         }
                         else if (fishes[i].type == objectiveFishes[j].type && objectiveFishes[j].count == 0)
                         {
-                            //if (fishScore > 0) fishScore--;
                             fishes[i].clicked = true;
                             renderFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
                             floatingTexts.back().position = {
@@ -449,8 +433,8 @@ void initEasyObjective() {
     EasyobjectiveRenderer = SDL_CreateRenderer(EasyobjectiveWindow, -1, SDL_RENDERER_ACCELERATED);
 
     if (!objectivesInitialized) {
-        for (int i = 1; i <= 10; ++i) { //chnged frm i=2 to i=1, i<=11 to i<=10  
-            availableTypes[i-1] = i; //i-1 frm i-2
+        for (int i = 1; i <= 10; ++i) {  
+            availableTypes[i-1] = i; 
         }
         std::mt19937 seed(std::chrono::system_clock::now().time_since_epoch().count());
         std::shuffle(availableTypes.begin(), availableTypes.end(), seed);
@@ -508,13 +492,12 @@ void renderEasyInterface() {
     SDL_FreeSurface(textSurface);
     SDL_DestroyTexture(timerTexture);
 
-    // 2x2 Grid for 4 objective fishes
     for (int i = 0; i < 4; ++i) {
         int row = i / 2;
         int col = i % 2;
 
-        int centerX = 45 + col * 170;  // horizontal spacing
-        int centerY = 95 + row * 60;// vertical spacing
+        int centerX = 45 + col * 170;  
+        int centerY = 95 + row * 60;
 
         SDL_Rect fishRect = {centerX, centerY, 60, 60};
         SDL_RenderCopy(interfaceRenderer, fishTextures[objectiveFishes[i].type], NULL, &fishRect);
@@ -612,12 +595,11 @@ void renderEasyObjective() {
     drawParallelogram(EasyobjectiveRenderer, backBtn, backBtn.hovered);
     renderText(EasyobjectiveRenderer, buttonFont, backBtn.text, white, backBtn.rect.x + backBtn.rect.w / 2, backBtn.rect.y + backBtn.rect.h / 2);
 
-    // 2x2 Grid layout for 4 fishes
     for (int i = 0; i < 4; ++i) {
         int col = i % 2;
         int row = i / 2;
 
-        int centerX = 250 + col * 300;  // 250, 550
+        int centerX = 250 + col * 300;  
         int centerY = 180 + row * 100; 
 
         SDL_Rect fishRect = {centerX - 60, centerY - 30, 60, 60};
@@ -683,10 +665,6 @@ void handleEasyInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
             SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
         }
     }
-
-
-    
-
     if (isPaused) {
         renderPauseMenu();
         handlePauseMenuEvents(e, isPaused);
@@ -716,8 +694,6 @@ void handleEasyInterfaceLogics() {
         gameoverOpen=true;
         initGameOver();
     }
-    
-    
 }
 
 
@@ -756,7 +732,6 @@ void destroyEasyInterface() {
 
     objectiveClose = false;
     objectivesInitialized = false;
-    //heartTexture = nullptr;
     titleFont = nullptr;
     smalltitleFont = nullptr;
     buttonFont = nullptr;
@@ -764,7 +739,6 @@ void destroyEasyInterface() {
     typeFont = nullptr;
     fishScore = 0;
     targetScore = 0;
-    //lives = 3;
     timerStartTime = 0;
     congratsStartTime = 0;
     pauseStartTime = 0;
@@ -772,12 +746,9 @@ void destroyEasyInterface() {
     isPaused = false;
     timerRunning = false;
     congratulationsFlag = false;
-
     for (int i = 0; i < MAX_FISH; ++i) {
         fishes[i] = PondFish();
     }
-
-    //gamewinOpen = false;
     lastCursorToggle = 0;
     remaining = 120000;
 
@@ -789,8 +760,6 @@ void destroyEasyInterface() {
     if(!sunnyOn){
         destroyRain();
     }
-    
-
     if (interfaceRenderer) {
         SDL_DestroyRenderer(interfaceRenderer);
         interfaceRenderer = nullptr;
@@ -799,25 +768,9 @@ void destroyEasyInterface() {
         SDL_DestroyWindow(interfaceWindow);
         interfaceWindow = nullptr;
     }
-
     EasyinterfaceOpen = false;
 }
 
 bool isEasyInterfaceOpen() {
     return interfaceWindow != nullptr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

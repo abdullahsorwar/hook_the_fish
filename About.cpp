@@ -118,8 +118,6 @@ void renderAbout() {
 
     drawParallelogram(aboutRenderer, back, back.hovered);
     renderText(aboutRenderer, buttonFont, back.text, white, back.rect.x + back.rect.w / 2, back.rect.y + back.rect.h / 2);
-    
-    //filledCircleRGBA(aboutRenderer, 310, 330, 130, 0, 0, 0, 255);
 
     renderText(aboutRenderer, nameFont, dev.name, black, 500, 150);
     renderLeftText(aboutRenderer, textFont, "Organization:", black, 480, 200);

@@ -53,7 +53,6 @@ static TTF_Font *textFont = nullptr;
 static TTF_Font *typeFont = nullptr;
 static TTF_Font *messageFont = nullptr;
 
-//int lives = 3;
 static Uint32 timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 static bool timerRunning = false;
@@ -300,7 +299,7 @@ void updateHardFishMotion()
         float y = fishes[i].baseY - radius * sin(angle);
 
         fishes[i].rect = {static_cast<int>(x), static_cast<int>(y), 80, 80};
-        fishes[i].t += 0.075f;
+        fishes[i].t += 0.070f;
 
         if (fishes[i].t >= PI)
         {
@@ -814,11 +813,6 @@ void handleHardInterfaceLogics()
     {
         initGameOver();
     }
-}
-
-void gameCondition()
-{
-    
 }
 
 void destroyHardInterface()

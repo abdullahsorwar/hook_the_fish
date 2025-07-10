@@ -114,4 +114,3 @@ void destroyControls() {
 bool isControlsOpen() {
     return ControlWindow != nullptr;
 }
-

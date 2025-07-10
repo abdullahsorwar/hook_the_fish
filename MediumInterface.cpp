@@ -24,12 +24,8 @@ static SDL_Rect boat = {500, 100, 200, 200};
 static SDL_Rect confirmButton = {300, 380, 200, 60};
 
 Mix_Music* medium_game_music = nullptr;
-
-//SDL_Window* interfaceWindow = nullptr;
-//static SDL_Renderer* interfaceRenderer = nullptr;
 static SDL_Renderer* objectiveRenderer = nullptr;
 static SDL_Window* mediumGameWinWindow = nullptr;
-//SDL_Renderer* hardInterfaceRenderer = nullptr;
 static SDL_Renderer* gamewinRenderer = nullptr;
 
 static SDL_Texture* pondTexture = nullptr;
@@ -43,7 +39,6 @@ static std::vector<SDL_Texture*> fishTextures, objectiveTextures, rippleTextures
 static TTF_Font* titleFont = nullptr, *buttonFont = nullptr, *textFont = nullptr, *typeFont = nullptr;
 static TTF_Font* smalltitleFont = nullptr, *messageFont = nullptr;
 
-//int lives = 3;
 uint32_t timerStartTime = 0;
 static Uint32 congratsStartTime = 0;
 bool timerRunning = false;
@@ -54,17 +49,6 @@ bool MediuminterfaceOpen = false;
 bool isLifeLost = false;
 static bool timerStarted = false;
 static bool congratulationsFlag = false;
-/*
-std::string mediumuserInput = "";
-std::string mediumfinalText = "";
-std::string mediumconf = "";
-
-static bool inputActive = false;
-static bool showCursor = true;
-static bool gamewinOpen = false;
-
-static Uint32 lastCursorToggle = 0;
-*/
 
 struct PondFish {
     SDL_Rect rect;
@@ -79,24 +63,17 @@ struct PondFish {
     int baseX, baseY;
     bool clicked;
 };
-/*
-struct ObjectiveFish {
-    int type;
-    int count;
-};*/
 
-//static ObjectiveFish objectiveFishes[5];
 static bool objectivesInitialized = false;
 static PondFish fishes[MAX_FISH];
 static std::vector<int> availableTypes(10);
 
 std::string getMediumFormattedTime() {
-    if (!timerRunning || isPaused) return "02:00";  // Return default time if timer is not running
+    if (!timerRunning || isPaused) return "02:00"; 
     
     Uint32 currentTime = SDL_GetTicks();
     Uint32 elapsed = currentTime - timerStartTime - totalPaused;
     remaining_time = (TIMER_DURATION>elapsed) ? (TIMER_DURATION-elapsed) : 0;
-    // If the elapsed time exceeds 120 seconds (02:00), stop the timer
     if (elapsed >= 120000) {
         elapsed = 120000;  
         timerRunning = false;
@@ -178,16 +155,12 @@ void spawnMediumFish() {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
-
-            // Randomly assign type, ensuring special fish types (golden and piranha) are handled separately
-            int type = rand() % 7;  // Normal fish types (0-4)
-            if (rand() % 100 < 10) {  // 10% chance for golden fish
-                type = 11;  // Golden fish type (last one in fishPaths)
-            } else if (rand() % 100 < 20) {  // 20% chance for piranha fish
-                type = 10;  // Piranha fish type (second last in fishPaths)
+            int type = rand() % 7;
+            if (rand() % 100 < 10) {
+                type = 11;
+            } else if (rand() % 100 < 20) {
+                type = 10;
             }
-
-            // Assign fish properties
             fishes[i].arcHeight = rand() % 60 + 70;
             fishes[i].rect.x = fishes[i].baseX;
             fishes[i].rect.y = fishes[i].baseY;
@@ -201,14 +174,12 @@ void spawnMediumFish() {
             fishes[i].clicked = false;
         }
     }
-
-    // Handle objective fishes (for the next group)
     for (int i = 7; i < MAX_FISH; ++i) {
         if (!fishes[i].active && rand() % 250 == 0) {
             fishes[i].baseX = rand() % (1240 - 40 + 1) + 40;
             fishes[i].baseY = rand() % (720 - 400) + 400;
             int direction = (rand() % 2 == 0) ? 1 : -1;
-            int type = i;  // Objective fish types (based on availableTypes, adjust logic here)
+            int type = i;
 
             fishes[i].arcHeight = rand() % 60 + 70;
             fishes[i].rect.x = fishes[i].baseX;
@@ -240,7 +211,7 @@ void updateMediumFishMotion() {
         float y = fishes[i].baseY - radius * sin(angle);
 
         fishes[i].rect = {static_cast<int>(x), static_cast<int>(y), 80, 80};
-        fishes[i].t += 0.060f;
+        fishes[i].t += 0.065f;
 
         if (fishes[i].t >= PI) {
             fishes[i].active = false;
@@ -280,8 +251,8 @@ void handleMediumFishClick(int x, int y) {
             x >= fishes[i].rect.x && x <= fishes[i].rect.x + fishes[i].rect.w &&
             y >= fishes[i].rect.y && y <= fishes[i].rect.y + fishes[i].rect.h) {
 
-            if (fishes[i].type == 11) {  // Golden fish type (assuming 11 represents golden fish)
-                fishScore += 15;  // Add 15 points for golden fish
+            if (fishes[i].type == 11) {  
+                fishScore += 15;  
                 fishes[i].clicked = true;
                 rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
                 floatingTexts.back().position = {
@@ -291,8 +262,8 @@ void handleMediumFishClick(int x, int y) {
                 break;
             }
 
-            else if (fishes[i].type == 10) {  // Piranha fish type (assuming 10 represents piranha fish)
-                lives--;  // Decrease life by 1
+            else if (fishes[i].type == 10) {  
+                lives--;  
                 fishes[i].clicked = true;
                 rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -1);
                 floatingTexts.back().position = {
@@ -301,24 +272,15 @@ void handleMediumFishClick(int x, int y) {
 
                 if (lives == 0) {                   
                     initGameOver();
-                    /*if (GameOverOpen) {
-                        SDL_Event e;
-                        while (SDL_PollEvent(&e)) {
-                            handleGameOverEvents(e, GameOverOpen);
-                        }
-                        renderGameOver();
-                        SDL_Delay(16);
-                    }*/
                 }
                 break;
                 
             }
-            // Handle regular and objective fishes
             else {
                 for (int j = 0; j < 5 && !fishes[i].clicked; j++) {
                     if (fishes[i].type == objectiveFishes[j].type) {
                         if(objectiveFishes[j].count>0){
-                            fishScore += 2;  // Increment score for objective fish
+                            fishScore += 2; 
                             rendermediumFadedText(fishes[i].type, SDL_GetTicks(), objectiveFishes[j].type, objectiveFishes[j].count);
                             floatingTexts.back().position = {
                                 fishes[i].rect.x + fishes[i].rect.w / 2,
@@ -339,17 +301,16 @@ void handleMediumFishClick(int x, int y) {
                             
                         }
                         if (targetScore > 0 && objectiveFishes[j].count>0) {
-                            targetScore--;  // Decrease target score
+                            targetScore--; 
                         }
                         if(objectiveFishes[j].count>0){
-                            objectiveFishes[j].count--;  // Decrease the objective fish count
+                            objectiveFishes[j].count--; 
                         }
                         fishes[i].clicked = true;
                         
                     }
                 }
 
-                // If it's not an objective fish, it's a regular fish
                 if (!fishes[i].clicked) {
                     if(fishScore>=0){
                         rendermediumFadedText(fishes[i].type, SDL_GetTicks(), -1, -2);
@@ -500,7 +461,6 @@ void renderMediumInterface() {
     SDL_Rect infoBox = {10, 10, 400, 220};
     drawRoundedButton(infoBox, "", white);
 
-    // Timer
     std::string timerText = "Time: " + getMediumFormattedTime();
     SDL_Surface* textSurface = TTF_RenderText_Solid(textFont, timerText.c_str(), black);
     SDL_Texture* timerTexture = SDL_CreateTextureFromSurface(interfaceRenderer, textSurface);
@@ -599,10 +559,6 @@ void renderMediumInterface() {
     }
 
     renderFaded();
-
-    /*if (gamewinOpen && targetScore == 0) {
-        mediumrenderGameWin();
-    }*/
     if (gameoverOpen)
     {
         renderGameOver();
@@ -653,9 +609,8 @@ void handleMediumInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
     if (!interfaceWindow) return;
 
     if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) {
-        // Initialize pause window and set the flag to true
         if (!isPaused) {
-            initPauseMenu();  // Initialize pause window
+            initPauseMenu(); 
             pauseStartTime = SDL_GetTicks(); 
             isPaused = true;
         }
@@ -676,24 +631,11 @@ void handleMediumInterfaceEvents(SDL_Event& e, bool& interfaceOpen) {
             SDL_DestroyWindow(objectiveWindow);
             objectiveClose = true;
             
-            // Start the timer when confirm is clicked
             timerStartTime = SDL_GetTicks();
             timerStarted = true;
             timerRunning = true;
         }
     }
-    /*
-    if (gamewinOpen) {
-        if (e.type == SDL_TEXTINPUT && inputActive) {
-            mediumuserInput += e.text.text;
-        }
-
-        if (e.type == SDL_KEYDOWN && inputActive) {
-            if (e.key.keysym.sym == SDLK_BACKSPACE && !mediumuserInput.empty()) {
-                mediumuserInput.pop_back();
-            }
-        }
-    }*/
 
     if (isPaused)
     {
@@ -730,12 +672,6 @@ void handleMediumInterfaceLogics(SDL_Event& e, bool& interfaceWindow){
 
 
 void destroyMediumInterface() {
-    
-    // Reset all static positions
-    /*pond = {0, 250, 1280, 470};
-    pond2 = {-1279, 250, 1280, 470};
-    mountain = {0, 0, 1280, 250};
-    mountain2 = {-1279, 0, 1280, 250};*/
 
     if (objectiveRenderer) {
         SDL_DestroyRenderer(objectiveRenderer);
@@ -745,8 +681,7 @@ void destroyMediumInterface() {
         SDL_DestroyWindow(objectiveWindow);
         objectiveWindow = nullptr;
     }
-    objectiveClose = false;  // Add this
-    // Destroy textures
+    objectiveClose = false; 
     if (pondTexture) {
         SDL_DestroyTexture(pondTexture);
         pondTexture = nullptr;
@@ -769,8 +704,6 @@ void destroyMediumInterface() {
         SDL_DestroyTexture(heartTexture);
         heartTexture = nullptr;
     }
-
-    // Free sound/music if necessary
     if (soundOn)
     {
         Mix_PauseMusic();
@@ -792,28 +725,14 @@ void destroyMediumInterface() {
     for (auto& tex : objectiveTextures) {
         if (tex) SDL_DestroyTexture(tex);
     }
-    // objectiveTextures.clear();
-
-    // Add this after your current objective reset
     for (int i = 0; i < 5; ++i) {
         objectiveFishes[i].type = 0;
         objectiveFishes[i].count = 0;
     }
     availableTypes.clear();
     availableTypes.resize(10);
-
-    // Reset game state
     fishScore = 0;
     lives = 3;
-    /*
-    mediumuserInput = "";
-    mediumfinalText = "";
-    mediumconf = "";
-    inputActive = false;
-    showCursor = true;
-    gamewinOpen = false;
-    lastCursorToggle = 0;
-    */
     remaining = 120000;
     remaining_time = 120000;
     totalPaused = 0;
@@ -828,19 +747,12 @@ void destroyMediumInterface() {
     medium_game_music = nullptr;
 
     for (int i = 0; i < MAX_FISH; ++i) {
-        fishes[i] = PondFish(); // Full struct reset
+        fishes[i] = PondFish();
         fishes[i].active = false;
         fishes[i].clicked = false;
         fishes[i].rippleActive = false;
         fishes[i].rippleFrame = 0;
     }
-
-    /*
-    for (int i = 0; i < 5; ++i) {
-        objectiveFishes[i].count = rand() % 6 + 4;  // Randomize new counts for objectives
-    }*/
-
-    // Set the flags back to false
     titleFont = nullptr, buttonFont = nullptr, textFont = nullptr, messageFont = nullptr;
     smalltitleFont = nullptr, typeFont = nullptr;
 
@@ -855,7 +767,6 @@ void destroyMediumInterface() {
     MediuminterfaceOpen = false;
 
 }
-
 
 bool isMediumInterfaceOpen() {
     return interfaceWindow != nullptr;

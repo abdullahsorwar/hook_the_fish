@@ -132,18 +132,15 @@ void renderHighScoreTrue()
 
     renderText(gameOverRenderer, textFont, "Enter your name: ", white, 400, 150);
 
-    // --- Centered and Scrolling Text ---
     std::string displayText = userInput;
     if (inputActive && showCursor)
     {
         displayText += "|";
     }
 
-    // Measure full text width
     int textWidth = 0, textHeight = 0;
     TTF_SizeText(typeFont, displayText.c_str(), &textWidth, &textHeight);
 
-    // Scroll if text is wider than box
     int maxVisibleWidth = inputBox.w - 20;
     std::string visibleText = displayText;
     while (!visibleText.empty())
@@ -151,18 +148,13 @@ void renderHighScoreTrue()
         TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, nullptr);
         if (textWidth <= maxVisibleWidth)
             break;
-        visibleText.erase(0, 1); // Scroll left
+        visibleText.erase(0, 1);
     }
 
-    // Center visible text inside inputBox
     TTF_SizeText(typeFont, visibleText.c_str(), &textWidth, &textHeight);
     int textX = inputBox.x + inputBox.w / 2;
     int textY = inputBox.y + inputBox.h / 2;
-
-    // Render the user input
     renderText(gameOverRenderer, typeFont, visibleText, white, textX, textY);
-
-    // Success message
     if (finalText == "0")
     {
         renderText(gameOverRenderer, messageFont, "Entry Successful!", white, 400, 300);

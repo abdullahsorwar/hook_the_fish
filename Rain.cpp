@@ -60,7 +60,7 @@ void generateLightning()
     bolt.points.push_back({x, y});
     for (int i = 0; i < 10; ++i)
     {
-        x += (rand() % 21) - 10; // slight horizontal zigzag
+        x += (rand() % 21) - 10;
         y += 1280 / 10;
         if (x < 0)
             x = 0;
@@ -68,7 +68,7 @@ void generateLightning()
             x = 1280;
         bolt.points.push_back({x, y});
     }
-    bolt.life = 5; // display for 5 frames
+    bolt.life = 5;
     lightnings.push_back(bolt);
 }
 
@@ -152,8 +152,6 @@ void renderRain()
                            static_cast<int>(drop.x + drop.tilt),
                            static_cast<int>(drop.y + drop.length));
     }
-
-    // Draw lightning bolts
     SDL_SetRenderDrawColor(interfaceRenderer, 255, 255, 255, 255);
     for (auto &bolt : lightnings)
     {
@@ -164,8 +162,6 @@ void renderRain()
                                bolt.points[i].x, bolt.points[i].y);
         }
     }
-
-    // Draw splashes
     SDL_SetRenderDrawColor(interfaceRenderer, 180, 180, 255, 255);
     for (auto &splash : splashes)
     {

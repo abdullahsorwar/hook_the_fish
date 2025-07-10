@@ -324,7 +324,7 @@ void renderPauseObjective()
             int col = i % 2;
             int row = i / 2;
 
-            int centerX = 250 + col * 300; // 250, 550
+            int centerX = 250 + col * 300;
             int centerY = 180 + row * 100;
 
             SDL_Rect fishRect = {centerX - 60, centerY - 30, 60, 60};

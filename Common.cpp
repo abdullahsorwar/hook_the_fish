@@ -91,8 +91,6 @@ void renderFadedText(int type, Uint32 init_time, int obj_type, int obj_count)
                 text.color = {255, 0, 0, 255};   
             }
         }        
-    // Position will be set to fish position when called
-    // So leave default for now
     text.startTime = init_time;
     floatingTexts.push_back(text);
 }
@@ -116,11 +114,6 @@ void rendermediumFadedText(int type, Uint32 init_time, int obj_type, int obj_cou
         text.text = "+2";
         text.color = {0, 255, 0, 255};
     }
-    /*else if (type == obj_type && obj_count == 0)
-    {
-        text.text = "-1";
-        text.color = {255, 0, 0, 255};
-    }*/
     else if (obj_type == -1 && obj_count == -1)
     {
         text.text = "+1";
@@ -135,9 +128,6 @@ void rendermediumFadedText(int type, Uint32 init_time, int obj_type, int obj_cou
         text.text = "-1";
         text.color = {255, 0, 0, 255};   
     }
-
-    // Position will be set to fish position when called
-    // So leave default for now
     text.startTime = init_time;
     floatingTexts.push_back(text);
 }
@@ -154,7 +144,6 @@ void renderFaded()
 
         if (progress >= 1.0f)
         {
-            // Remove expired text
             floatingTexts.erase(floatingTexts.begin() + i);
             continue;
         }
@@ -167,7 +156,6 @@ void renderFaded()
         int textX = text.position.x;
         int textY = text.position.y + offsetY;
 
-        // Render centered
         SDL_Surface *surf = TTF_RenderText_Blended(textFont, text.text.c_str(), renderColor);
         SDL_Texture *tex = SDL_CreateTextureFromSurface(interfaceRenderer, surf);
         SDL_Rect dst = {
