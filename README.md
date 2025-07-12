@@ -59,3 +59,11 @@ SDL2 (Simple Directmedia Layer 2)
 </ul>
 <h2>Compile Code</h2>
 g++ main.cpp Common.cpp Exit.cpp Settings.cpp HighScores.cpp GameRules.cpp Controls.cpp Weather.cpp NewGame.cpp HardInterface.cpp MediumInterface.cpp EasyInterface.cpp Loading.cpp Pause.cpp Rain.cpp GameOver.cpp About.cpp -o Game -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lSDL2_gfx -ldl
+<h2>Dependencies</h2>
+<ul>
+  <li>SDL2</li>
+  <li>SDL2_ttf</li>
+  <li>SDL2_mixer</li>
+  <li>SDL2_image</li>
+  <li>SDL2_gfx</li>
+</ul>
