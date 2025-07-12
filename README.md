@@ -57,3 +57,5 @@ SDL2 (Simple Directmedia Layer 2)
   <li>In-Game Pause Menu to naturally Quit Game, Sound On/Off or going through Game Rules</li>
   <li>In-Game Randomized Objective Fishes</li>
 </ul>
+<h2>Compile Code</h2>
+g++ main.cpp Common.cpp Exit.cpp Settings.cpp HighScores.cpp GameRules.cpp Controls.cpp Weather.cpp NewGame.cpp HardInterface.cpp MediumInterface.cpp EasyInterface.cpp Loading.cpp Pause.cpp Rain.cpp GameOver.cpp About.cpp -o Game -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lSDL2_gfx -ldl
